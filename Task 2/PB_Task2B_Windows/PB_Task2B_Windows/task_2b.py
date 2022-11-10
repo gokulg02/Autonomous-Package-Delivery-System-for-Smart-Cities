@@ -183,7 +183,6 @@ def control_logic(sim):
 	---
 	control_logic(sim)
 	"""
-
 	##############  ADD YOUR CODE HERE  ##############
 	visionSensorHandle = sim.getObject('/vision_sensor')
 	lh=sim.getObject("/left_joint")
@@ -205,23 +204,22 @@ def control_logic(sim):
 		#print(angle)
 		if isnode(img):
 			count+=1
-			print(count)
+			#print(count)
 			
 			#time.sleep(3)
 			if(count==5 or count==9 or count==13):
 
-                #to make visible
+				v1=sim.setJointTargetVelocity(lh,1)
+				v2=sim.setJointTargetVelocity(rh,1)
+				time.sleep(0.46)
+				v1=sim.setJointTargetVelocity(lh,0)
+				v2=sim.setJointTargetVelocity(rh,0)
+				#to make visible
 				arena_dummy_handle = sim.getObject("/Arena_dummy") 
 				childscript_handle = sim.getScript(sim.scripttype_childscript, arena_dummy_handle, "")
 				sim.callScriptFunction("activate_qr_code", childscript_handle, "checkpoint "+chr(64+count))
-
-				v1=sim.setJointTargetVelocity(lh,1)
-				v2=sim.setJointTargetVelocity(rh,1)
-				time.sleep(0.7)
-				v1=sim.setJointTargetVelocity(lh,0)
-				v2=sim.setJointTargetVelocity(rh,0)
-				time.sleep(5)
-				print("reading qr")
+				#time.sleep(5)
+				#print("reading qr")
 				message=read_qr_code(sim)
 				
 
@@ -235,15 +233,15 @@ def control_logic(sim):
 				sim.callScriptFunction("deactivate_qr_code", childscript_handle, "checkpoint "+chr(64+count))
 
 
-				if(message=='Orange Cone'):
+				if(message==b'Orange Cone'):
 					arena_dummy_handle = sim.getObject("/Arena_dummy") 
 					childscript_handle = sim.getScript(sim.scripttype_childscript, arena_dummy_handle, "")
 					sim.callScriptFunction("deliver_package", childscript_handle, "package_1", "checkpoint "+chr(64+count))
-				elif(message=='Blue Cylinder'):
+				elif(message==b'Blue Cylinder'):
 					arena_dummy_handle = sim.getObject("/Arena_dummy") 
 					childscript_handle = sim.getScript(sim.scripttype_childscript, arena_dummy_handle, "")
 					sim.callScriptFunction("deliver_package", childscript_handle, "package_2", "checkpoint "+chr(64+count))
-				elif(message=='Pink Cuboid'):
+				elif(message==b'Pink Cuboid'):
 					arena_dummy_handle = sim.getObject("/Arena_dummy") 
 					childscript_handle = sim.getScript(sim.scripttype_childscript, arena_dummy_handle, "")
 					sim.callScriptFunction("deliver_package", childscript_handle, "package_3", "checkpoint "+chr(64+count))	
@@ -256,7 +254,7 @@ def control_logic(sim):
 				time.sleep(0.25)
 				
 			else:
-				print("no rq")
+				#print("no rq")
 				v1=sim.setJointTargetVelocity(lh,1)
 				v2=sim.setJointTargetVelocity(rh,1)
 				while (isnode(img)):
@@ -326,18 +324,16 @@ def read_qr_code(sim):
 	qr_message = None
 	
 	##############  ADD YOUR CODE HERE  ##############
-	try:
-		visionSensorHandle = sim.getObject('/vision_sensor')
-		img, resX, resY = sim.getVisionSensorCharImage(visionSensorHandle)
-		img = np.frombuffer(img, dtype=np.uint8).reshape(resY, resX, 3)
-		img = cv2.flip(img, 0)
-		cv2.imshow("qr",img)
-		cv2.waitKey(10)
-		a=decode(img)
-		print(a)
-		qr_message=a.data
-	except:
-		qr_message = None
+
+	visionSensorHandle = sim.getObject('/vision_sensor')
+	img, resX, resY = sim.getVisionSensorCharImage(visionSensorHandle)
+	img = np.frombuffer(img, dtype=np.uint8).reshape(resY, resX, 3)
+	img = cv2.flip(img, 0)
+	#cv2.imshow("qr",img)
+	#cv2.waitKey(10)
+	a=decode(img)
+	qr_message=a[0].data
+	#print(qr_message)
 		
 	##################################################
 	return qr_message
