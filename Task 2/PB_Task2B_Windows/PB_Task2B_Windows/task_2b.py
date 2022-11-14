@@ -209,9 +209,9 @@ def control_logic(sim):
 			#time.sleep(3)
 			if(count==5 or count==9 or count==13):
 
-				v1=sim.setJointTargetVelocity(lh,1)
-				v2=sim.setJointTargetVelocity(rh,1)
-				time.sleep(0.46)
+				v1=sim.setJointTargetVelocity(lh,3)
+				v2=sim.setJointTargetVelocity(rh,3)
+				time.sleep(0.166)
 				v1=sim.setJointTargetVelocity(lh,0)
 				v2=sim.setJointTargetVelocity(rh,0)
 				#to make visible
@@ -245,48 +245,48 @@ def control_logic(sim):
 					arena_dummy_handle = sim.getObject("/Arena_dummy") 
 					childscript_handle = sim.getScript(sim.scripttype_childscript, arena_dummy_handle, "")
 					sim.callScriptFunction("deliver_package", childscript_handle, "package_3", "checkpoint "+chr(64+count))	
-				v1=sim.setJointTargetVelocity(lh,1)
-				v2=sim.setJointTargetVelocity(rh,1)
+				v1=sim.setJointTargetVelocity(lh,3)
+				v2=sim.setJointTargetVelocity(rh,3)
 				while (isnode(img)):
 					img, resX, resY = sim.getVisionSensorCharImage(visionSensorHandle)
 					img = np.frombuffer(img, dtype=np.uint8).reshape(resY, resX, 3)
 					img = cv2.flip(img, 0)
-				time.sleep(0.25)
+				time.sleep(0.04)
 				
 			else:
 				#print("no rq")
-				v1=sim.setJointTargetVelocity(lh,1)
-				v2=sim.setJointTargetVelocity(rh,1)
+				v1=sim.setJointTargetVelocity(lh,3)
+				v2=sim.setJointTargetVelocity(rh,3)
 				while (isnode(img)):
 					img, resX, resY = sim.getVisionSensorCharImage(visionSensorHandle)
 					img = np.frombuffer(img, dtype=np.uint8).reshape(resY, resX, 3)
 					img = cv2.flip(img, 0)
-				time.sleep(0.25)
+				time.sleep(0.05)
 					
 				if count==1 or count==3 or count==7 or count==11 or count==15: 
-					v1=sim.setJointTargetVelocity(lh,-1)
-					v2=sim.setJointTargetVelocity(rh,1)
-					time.sleep(1.8)
+					v1=sim.setJointTargetVelocity(lh,-3)
+					v2=sim.setJointTargetVelocity(rh,3)
+					time.sleep(0.65)
 				elif count==2 or count==4 or count==6 or count==8 or count==10 or count==12 or count==14 or count==16:
-					v1=sim.setJointTargetVelocity(lh,1)
-					v2=sim.setJointTargetVelocity(rh,-1)
-					time.sleep(1.8)
+					v1=sim.setJointTargetVelocity(lh,3)
+					v2=sim.setJointTargetVelocity(rh,-3)
+					time.sleep(0.65)
 				elif count==5 or count==9 or count==10 or count==13:
-					v1=sim.setJointTargetVelocity(lh,1)
-					v2=sim.setJointTargetVelocity(rh,1)
-					time.sleep(1.8)
+					v1=sim.setJointTargetVelocity(lh,3)
+					v2=sim.setJointTargetVelocity(rh,3)
+					time.sleep(0.65)
 				elif count==17:
 					break		
 
 		elif(angle==90):
 			v1=sim.setJointTargetVelocity(lh,3)
 			v2=sim.setJointTargetVelocity(rh,3)
-		elif(angle<90):
-			v1=sim.setJointTargetVelocity(lh,0.5)
-			v2=sim.setJointTargetVelocity(rh,0) 
+		elif(angle<89):
+			v1=sim.setJointTargetVelocity(lh,1.5)
+			v2=sim.setJointTargetVelocity(rh,0.5) 
 		elif(angle>90):
-			v1=sim.setJointTargetVelocity(lh,0)
-			v2=sim.setJointTargetVelocity(rh,0.5)
+			v1=sim.setJointTargetVelocity(lh,0.5)
+			v2=sim.setJointTargetVelocity(rh,1.5)
 
 		cv2.imshow('image', img)
 		cv2.waitKey(1)

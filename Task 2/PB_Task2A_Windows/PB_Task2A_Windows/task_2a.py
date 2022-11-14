@@ -65,8 +65,11 @@ def control_logic(sim):
 	##############  ADD YOUR CODE HERE  ##############
 	lh=sim.getObject("/left_joint")
 	rh=sim.getObject("/right_joint")
+	v1=sim.setJointTargetVelocity(lh,0)
+	v2=sim.setJointTargetVelocity(rh,0)
 	t=time.time()
-	f=2.75
+	time.sleep(0.1)
+	f=2.75+1+1
 	while(1):
 		dl=detect_distance_sensor_1(sim)
 		dr=detect_distance_sensor_2(sim)
@@ -75,26 +78,24 @@ def control_logic(sim):
 		#print("r:  ",dr)	
 		#print(dr[4][2])	
 		if ((dl[0] and dr[0] and rr[0]) and dl[1]<=0.25 and dr[1]<=0.25 and rr[1]<=0.25 ):
-			v1=sim.setJointTargetVelocity(lh,0)
-			v2=sim.setJointTargetVelocity(rh,0)
 			return 0
 		elif (dl[0]==0 and dr[0]):
 			#print("s")
 			v1=sim.setJointTargetVelocity(lh,f)
 			v2=sim.setJointTargetVelocity(rh,f)
-			if(dr[1]>0.17531350255012512):
-				v1=sim.setJointTargetVelocity(lh,f+0.05*f)
+			if(dr[1]>0.17531350255012512 or rr[1]<0.17531350255012512):
+				v1=sim.setJointTargetVelocity(lh,f+0.16*f)
 				v2=sim.setJointTargetVelocity(rh,f)
-			if(dr[1]<0.17531350255012512):
+			if(dr[1]<0.17531350255012512 or rr[1]>0.17531350255012512):
 				v1=sim.setJointTargetVelocity(lh,f)
-				v2=sim.setJointTargetVelocity(rh,f+0.05*f)	
-		elif (dl[0] and dl[1]<=0.18102723360061646 and dr[0]):
+				v2=sim.setJointTargetVelocity(rh,f+0.16*f)	
+		elif (dl[0] and dl[1]<=0.18102723360061646+0.12 and dr[0]):
 			#print("l")
-			v1=sim.setJointTargetVelocity(lh,-0.5)
-			v2=sim.setJointTargetVelocity(rh,0.5)
-			time.sleep(0.5)
+			v1=sim.setJointTargetVelocity(lh,-2)
+			v2=sim.setJointTargetVelocity(rh,2)
+			#time.sleep(0.5)
 			dr=detect_distance_sensor_2(sim)
-			while(dr[4][2]>-0.999):
+			while(dr[4][2]>-0.899):
 				#print(dr[4][2])
 				dr=detect_distance_sensor_2(sim)
 			
@@ -104,26 +105,26 @@ def control_logic(sim):
 				dr=detect_distance_sensor_2(sim)
 				print(dr)				
 			'''
-		elif (dl[0] and dl[1]<=0.18102723360061646 and rr[0]):
+		elif (dl[0] and dl[1]<=0.18102723360061646+0.12 and rr[0]):
 			#print("r")
 			#print(dl[1])
-			v1=sim.setJointTargetVelocity(lh,0.5)
-			v2=sim.setJointTargetVelocity(rh,-0.5)
-			time.sleep(0.5)
+			v1=sim.setJointTargetVelocity(lh,2)
+			v2=sim.setJointTargetVelocity(rh,-2)
+			#time.sleep(0.5)
 			rr=detect_distance_sensor_3(sim)
-			while(rr[4][2]>-0.999):
+			while(rr[4][2]>-0.899):
 				#print(rr[4][2])
 				rr=detect_distance_sensor_3(sim)
 			
 		else:
 			v1=sim.setJointTargetVelocity(lh,f)
 			v2=sim.setJointTargetVelocity(rh,f)
-			if(dr[1]>0.17531350255012512):
-				v1=sim.setJointTargetVelocity(lh,f+0.05*f)
+			if(dr[1]>0.17531350255012512 or rr[1]<0.17531350255012512):
+				v1=sim.setJointTargetVelocity(lh,f+0.16*f)
 				v2=sim.setJointTargetVelocity(rh,f)
-			if(dr[1]<0.17531350255012512):
+			if(dr[1]<0.17531350255012512 or rr[1]>0.17531350255012512):
 				v1=sim.setJointTargetVelocity(lh,f)
-				v2=sim.setJointTargetVelocity(rh,f+0.04*f)			
+				v2=sim.setJointTargetVelocity(rh,f+0.16*f)			
 
 
 
@@ -193,7 +194,7 @@ def detect_distance_sensor_2(sim):
 def detect_distance_sensor_3(sim):
 	distance = None
 	##############  ADD YOUR CODE HERE  ##############
-	sensorHandle=sim.getObject("/distance_sensor_2/distance_sensor_1")
+	sensorHandle=sim.getObject("/distance_sensor_3")
 	distance=sim.readProximitySensor(sensorHandle)
 
 	return distance 
