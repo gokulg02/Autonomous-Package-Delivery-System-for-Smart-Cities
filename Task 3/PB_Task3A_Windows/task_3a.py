@@ -168,7 +168,7 @@ def detect_arena_parameters(maze_image):
 	arena_parameters = {}
 
 	##############	ADD YOUR CODE HERE	##############
-	
+	arena_parameters["paths"]=detect_paths_to_graph(maze_image)
 	##################################################
 	
 	return arena_parameters
