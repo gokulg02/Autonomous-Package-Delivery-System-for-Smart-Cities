@@ -31,8 +31,52 @@ import cv2
 ##############################################################
 
 ################# ADD UTILITY FUNCTIONS HERE #################
-col=['A','B','C','D','E','F','G','H']
-
+def graph(paths,lower_red,upper_red):
+	mask= cv2.inRange(image, lower_red, upper_red)
+	cnts = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	for c in cnts[0]:
+		M = cv2.moments(c)
+		cX = int(M["m10"] / M["m00"])
+		cY = int(M["m01"] / M["m00"])
+		scX=str(cX)
+		scX=int(scX[0])+64
+		scX=chr(scX)
+		scY=str(cY)
+		scY=scY[0]
+		paths[scX+scY]={}
+		b,g,r=image[cY,cX+20]
+		if(b==0 and g==0 and r==0):
+			rcX=str(cX+100)
+			rcX=int(rcX[0])+64
+			rcX=chr(rcX)
+			rcY=str(cY)
+			rcY=rcY[0]
+			paths[scX+scY][rcX+rcY]=1
+		b,g,r=image[cY,cX-20]
+		if(b==0 and g==0 and r==0):
+			lcX=str(cX-100)
+			lcX=int(lcX[0])+64
+			lcX=chr(lcX)
+			lcY=str(cY)
+			lcY=lcY[0]
+			paths[scX+scY][lcX+lcY]=1    
+		b,g,r=image[cY+20,cX]
+		if(b==0 and g==0 and r==0):
+			ucX=str(cX)
+			ucX=int(ucX[0])+64
+			ucX=chr(ucX)
+			ucY=str(cY+100)
+			ucY=ucY[0]
+			paths[scX+scY][ucX+ucY]=1      
+		b,g,r=image[cY-20,cX]
+		if(b==0 and g==0 and r==0):
+			dcX=str(cX)
+			dcX=int(dcX[0])+64
+			dcX=chr(dcX)
+			dcY=str(cY-100)
+			dcY=dcY[0]
+			paths[scX+scY][dcX+dcY]=1
+	return paths 
 
 
 
@@ -63,7 +107,62 @@ def detect_all_nodes(image):
 	end_node = ""
 
 	##############	ADD YOUR CODE HERE	##############
-	
+
+	#Traffic signals
+
+	lower_red = np.array([0, 0, 255])
+	upper_red = np.array([0, 0, 255])
+	mask= cv2.inRange(image, lower_red, upper_red)
+	cnts = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	for c in cnts[0]:
+		M = cv2.moments(c)
+		cX = int(M["m10"] / M["m00"])
+		cY = int(M["m01"] / M["m00"])
+		cX=str(cX)
+		cX=int(cX[0])+64
+		cX=chr(cX)
+		cY=str(cY)
+		cY=cY[0]
+		traffic_signals.append(cX+cY)
+		traffic_signals.sort()
+
+
+    #Start Node
+
+	lower_red = np.array([0, 255, 0])
+	upper_red = np.array([0, 255, 0])
+	mask= cv2.inRange(image, lower_red, upper_red)
+	cnts = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	for c in cnts[0]:
+		if len(c)==4 and cv2.contourArea(c)==144:
+			M = cv2.moments(c)
+			cX = int(M["m10"] / M["m00"])
+			cY = int(M["m01"] / M["m00"])
+			cX=str(cX)
+			cX=int(cX[0])+64
+			cX=chr(cX)
+			cY=str(cY)
+			cY=cY[0]
+			start_node=cX+cY
+		else:
+			continue	
+
+    #End Node	
+
+	lower_red = np.array([189, 43, 105])
+	upper_red = np.array([189, 43, 105])
+	mask= cv2.inRange(image, lower_red, upper_red)
+	cnts = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	for c in cnts[0]:
+		M = cv2.moments(c)
+		cX = int(M["m10"] / M["m00"])
+		cY = int(M["m01"] / M["m00"])
+		cX=str(cX)
+		cX=int(cX[0])+64
+		cX=chr(cX)
+		cY=str(cY)
+		cY=cY[0]
+		end_node=cX+cY
 	##################################################
 
 	return traffic_signals, start_node, end_node
@@ -99,33 +198,25 @@ def detect_paths_to_graph(image):
 	paths = {}
 
 	##############	ADD YOUR CODE HERE	##############
-	lr=np.array([0,0,0])
-	ur=np.array([5,5,5])
-	mask=cv2.inRange(image,lr,ur)
-	for i in range(100,601,100):
-		for j in range(100,601,100):
-			l=list()
-			if (mask[i-30][j]):
-				s=col[int(j/100)-1]+str(int(i/100)-1)
-				l.append(s)
-				
-			if (mask[i+30][j]):
-				s=col[int(j/100)-1]+str(int(i/100)+1)
-				l.append(s)
-				
-			if (mask[i][j-30]):
-				s=col[int(j/100)-2]+str(int(i/100))
-				l.append(s)
-				
-			if (mask[i][j+30]):
-				s=col[int(j/100)]+str(int(i/100))	
-				l.append(s)
-				
-			s=col[int(j/100)-1]+str(int(i/100))
-			paths[s]=l
-			
-			
-			
+	
+	lower_red = np.array([255, 0, 0])
+	upper_red = np.array([255, 0, 0])
+	path=graph(paths,lower_red,upper_red)
+	paths.update(path)
+	lower_red = np.array([0, 0, 255])
+	upper_red = np.array([0, 0, 255])
+	path=graph(paths,lower_red,upper_red)
+	paths.update(path)
+	lower_red = np.array([0, 255, 0])
+	upper_red = np.array([0, 255, 0])
+	path=graph(paths,lower_red,upper_red)
+	paths.update(path)
+	lower_red = np.array([189, 43, 105])
+	upper_red = np.array([189, 43, 105])
+	path=graph(paths,lower_red,upper_red)
+	paths.update(path)
+	
+
 	##################################################
 
 	return paths
@@ -168,7 +259,10 @@ def detect_arena_parameters(maze_image):
 	arena_parameters = {}
 
 	##############	ADD YOUR CODE HERE	##############
-	arena_parameters["paths"]=detect_paths_to_graph(maze_image)
+	traffic_signals,start_node,end_node=detect_all_nodes(maze_image)
+	arena_parameters["traffic_signals"]=traffic_signals
+	arena_parameters["start_node"]=start_node
+	arena_parameters["end_node"]=end_node
 	##################################################
 	
 	return arena_parameters
@@ -261,7 +355,6 @@ if __name__ == "__main__":
 			# read image using opencv
 			image = cv2.imread(img_file_path)
 			
-			'''
 			# detect the arena parameters from the image
 			arena_parameters = detect_arena_parameters(image)
 			print('\n============================================')
@@ -274,14 +367,8 @@ if __name__ == "__main__":
 
 			print("PATH PLANNED: ", back_path)
 			print("MOVES TO TAKE: ", moves)
-			'''
+
 			# display the test image
-			p=detect_paths_to_graph(image)
-			print(p)
-			print()
-			print()
-			print()
 			cv2.imshow("image", image)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
-			
