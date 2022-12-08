@@ -31,7 +31,7 @@ import cv2
 ##############################################################
 
 ################# ADD UTILITY FUNCTIONS HERE #################
-
+col=['A','B','C','D','E','F','G','H']
 
 
 
@@ -85,9 +85,12 @@ def detect_paths_to_graph(image):
 	Returns:
 	---
 	`paths` : { dictionary }
-			Every node's connection to other node
-			Eg. : { "D3":{"C3", "E3", "D2", "D4" }, 
-					"D5":{"C5", "D2", "D6" }  }
+			Every node's connection to other node and set it's value as edge value 
+			Eg. : { "D3":{"C3":1, "E3":1, "D2":1, "D4":1}, 
+					"D5":{"C5":1, "D2":1, "D6":1 }  }
+
+			Why edge value 1? -->> since every road is equal
+
 	Example call:
 	---
 	paths = detect_paths_to_graph(maze_image)
@@ -96,7 +99,33 @@ def detect_paths_to_graph(image):
 	paths = {}
 
 	##############	ADD YOUR CODE HERE	##############
-	
+	lr=np.array([0,0,0])
+	ur=np.array([5,5,5])
+	mask=cv2.inRange(image,lr,ur)
+	for i in range(100,601,100):
+		for j in range(100,601,100):
+			l=list()
+			if (mask[i-30][j]):
+				s=col[int(j/100)-1]+str(int(i/100)-1)
+				l.append(s)
+				
+			if (mask[i+30][j]):
+				s=col[int(j/100)-1]+str(int(i/100)+1)
+				l.append(s)
+				
+			if (mask[i][j-30]):
+				s=col[int(j/100)-2]+str(int(i/100))
+				l.append(s)
+				
+			if (mask[i][j+30]):
+				s=col[int(j/100)]+str(int(i/100))	
+				l.append(s)
+				
+			s=col[int(j/100)-1]+str(int(i/100))
+			paths[s]=l
+			
+			
+			
 	##################################################
 
 	return paths
@@ -139,7 +168,7 @@ def detect_arena_parameters(maze_image):
 	arena_parameters = {}
 
 	##############	ADD YOUR CODE HERE	##############
-
+	
 	##################################################
 	
 	return arena_parameters
@@ -156,8 +185,8 @@ def path_planning(graph, start, end):
 
 	Input Arguments:
 	---
-	`graph` :	[ numpy array ]
-			numpy array of image returned by cv2 library
+	`graph` :	{ dictionary }
+			dict of all connecting path
 	`start` :	str
 			name of start node
 	`end` :		str
@@ -179,7 +208,7 @@ def path_planning(graph, start, end):
 	backtrace_path=[]
 
 	##############	ADD YOUR CODE HERE	##############
-
+	
 	##################################################
 
 
@@ -213,7 +242,7 @@ def paths_to_moves(paths, traffic_signal):
 	list_moves=[]
 
 	##############	ADD YOUR CODE HERE	##############
-
+	
 	##################################################
 
 	return list_moves
@@ -232,6 +261,7 @@ if __name__ == "__main__":
 			# read image using opencv
 			image = cv2.imread(img_file_path)
 			
+			'''
 			# detect the arena parameters from the image
 			arena_parameters = detect_arena_parameters(image)
 			print('\n============================================')
@@ -244,8 +274,14 @@ if __name__ == "__main__":
 
 			print("PATH PLANNED: ", back_path)
 			print("MOVES TO TAKE: ", moves)
-
+			'''
 			# display the test image
+			p=detect_paths_to_graph(image)
+			print(p)
+			print()
+			print()
+			print()
 			cv2.imshow("image", image)
 			cv2.waitKey(0)
 			cv2.destroyAllWindows()
+			
