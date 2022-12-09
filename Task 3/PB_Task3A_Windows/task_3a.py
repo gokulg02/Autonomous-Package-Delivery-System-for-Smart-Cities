@@ -31,6 +31,7 @@ import cv2
 ##############################################################
 
 ################# ADD UTILITY FUNCTIONS HERE #################
+<<<<<<< Updated upstream
 def graph(image,paths,lower_red,upper_red):
 	mask= cv2.inRange(image, lower_red, upper_red)
 	cnts = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -77,6 +78,11 @@ def graph(image,paths,lower_red,upper_red):
 			dcY=dcY[0]
 			paths[scX+scY][dcX+dcY]=1
 	return paths 
+=======
+
+col=['A','B','C','D','E','F']
+
+>>>>>>> Stashed changes
 
 
 
@@ -199,6 +205,7 @@ def detect_paths_to_graph(image):
 
 	##############	ADD YOUR CODE HERE	##############
 	
+<<<<<<< Updated upstream
 	lower_red = np.array([255, 0, 0])
 	upper_red = np.array([255, 0, 0])
 	path=graph(image,paths,lower_red,upper_red)
@@ -215,6 +222,33 @@ def detect_paths_to_graph(image):
 	upper_red = np.array([189, 43, 105])
 	path=graph(image,paths,lower_red,upper_red)
 	paths.update(path)
+=======
+	lr=np.array([0,0,0])
+	ur=np.array([5,5,5])
+	mask=cv2.inRange(image,lr,ur)
+	for i in range(100,601,100):
+		for j in range(100,601,100):
+			l=dict()
+			if (mask[i-30][j]):
+				s=col[int(j/100)-1]+str(int(i/100)-1)
+				l[s]=1
+				
+			if (mask[i+30][j]):
+				s=col[int(j/100)-1]+str(int(i/100)+1)
+				l[s]=1
+				
+			if (mask[i][j-30]):
+				s=col[int(j/100)-2]+str(int(i/100))
+				l[s]=1
+				
+			if (mask[i][j+30]):
+				s=col[int(j/100)]+str(int(i/100))	
+				l[s]=1
+				
+			s=col[int(j/100)-1]+str(int(i/100))
+			paths[s]=l
+
+>>>>>>> Stashed changes
 	##################################################
 
 	return paths
@@ -262,7 +296,11 @@ def detect_arena_parameters(maze_image):
 	arena_parameters["start_node"]=start_node
 	arena_parameters["end_node"]=end_node
 	arena_parameters["paths"]=detect_paths_to_graph(maze_image)
+<<<<<<< Updated upstream
 
+=======
+	print(arena_parameters)
+>>>>>>> Stashed changes
 	##################################################
 	
 	return arena_parameters
@@ -444,7 +482,7 @@ if __name__ == "__main__":
 			img_file_path = img_dir_path + img_key  + '.png'
 			# read image using opencv
 			image = cv2.imread(img_file_path)
-			
+			'''
 			# detect the arena parameters from the image
 			arena_parameters = detect_arena_parameters(image)
 			print('\n============================================')
@@ -457,7 +495,8 @@ if __name__ == "__main__":
 
 			print("PATH PLANNED: ", back_path)
 			print("MOVES TO TAKE: ", moves)
-
+			'''
+			detect_arena_parameters(image)
 			# display the test image
 			cv2.imshow("image", image)
 			cv2.waitKey(0)
