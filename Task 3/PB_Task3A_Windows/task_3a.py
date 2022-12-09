@@ -31,7 +31,7 @@ import cv2
 ##############################################################
 
 ################# ADD UTILITY FUNCTIONS HERE #################
-def graph(paths,lower_red,upper_red):
+def graph(image,paths,lower_red,upper_red):
 	mask= cv2.inRange(image, lower_red, upper_red)
 	cnts = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 	for c in cnts[0]:
@@ -201,19 +201,19 @@ def detect_paths_to_graph(image):
 	
 	lower_red = np.array([255, 0, 0])
 	upper_red = np.array([255, 0, 0])
-	path=graph(paths,lower_red,upper_red)
+	path=graph(image,paths,lower_red,upper_red)
 	paths.update(path)
 	lower_red = np.array([0, 0, 255])
 	upper_red = np.array([0, 0, 255])
-	path=graph(paths,lower_red,upper_red)
+	path=graph(image,paths,lower_red,upper_red)
 	paths.update(path)
 	lower_red = np.array([0, 255, 0])
 	upper_red = np.array([0, 255, 0])
-	path=graph(paths,lower_red,upper_red)
+	path=graph(image,paths,lower_red,upper_red)
 	paths.update(path)
 	lower_red = np.array([189, 43, 105])
 	upper_red = np.array([189, 43, 105])
-	path=graph(paths,lower_red,upper_red)
+	path=graph(image,paths,lower_red,upper_red)
 	paths.update(path)
 	##################################################
 
@@ -283,7 +283,7 @@ def path_planning(graph, start, end):
 			dict of all connecting path
 	`start` :	str
 			name of start node
-	`end` :		str
+	`end` :		strs
 			name of end node
 
 
@@ -318,14 +318,11 @@ def path_planning(graph, start, end):
 		for current_node in unvisited:
 			if min_node is None:
 				min_node = current_node
-			elif shortest_distances[min_node] \
-				> shortest_distances[current_node]:
+			elif shortest_distances[min_node] > shortest_distances[current_node]:
 				min_node = current_node
 		for (node, value) in unvisited[min_node].items():
-			if value + shortest_distances[min_node] \
-				< shortest_distances[node]:
-				shortest_distances[node] = value \
-					+ shortest_distances[min_node]
+			if value + shortest_distances[min_node] < shortest_distances[node]:
+				shortest_distances[node] = value + shortest_distances[min_node]
 				path_nodes[node] = min_node
 		unvisited.pop(min_node)
 	node = destination
@@ -367,9 +364,69 @@ def paths_to_moves(paths, traffic_signal):
 	"""    
 	
 	list_moves=[]
-
 	##############	ADD YOUR CODE HERE	##############
-	
+	direction='n'
+	for i in range(len(paths)-1):
+		if paths[i][0]<paths[i+1][0]:
+
+			if paths[i] in traffic_signal:
+				list_moves.append('WAIT_5')
+
+			if direction=='n':
+				list_moves.append('RIGHT')
+			elif direction=='l':
+				list_moves.append('REVERSE')
+			elif direction=='r':
+				list_moves.append('STRAIGHT')
+			elif direction=='s':
+				list_moves.append('LEFT')  
+			direction='r'
+			        
+		elif paths[i][0]>paths[i+1][0]:
+
+			if paths[i] in traffic_signal:
+				list_moves.append('WAIT_5') 
+
+			if direction=='n':
+				list_moves.append('LEFT')
+			elif direction=='l':
+				list_moves.append('STRAIGHT')
+			elif direction=='r':
+				list_moves.append('REVERSE')
+			elif direction=='s':
+				list_moves.append('RIGHT')
+			direction='l'
+			       
+		elif paths[i][1]<paths[i+1][1]:
+
+			if paths[i] in traffic_signal:
+				list_moves.append('WAIT_5') 
+
+			if direction=='n':
+				list_moves.append('REVERSE')
+			elif direction=='l':
+				list_moves.append('LEFT')
+			elif direction=='r':
+				list_moves.append('RIGHT')
+			elif direction=='s':
+				list_moves.append('STRAIGHT')
+			direction='s'
+			     
+		elif paths[i][1]>paths[i+1][1]:
+
+			if paths[i] in traffic_signal:
+				list_moves.append('WAIT_5')
+
+			if direction=='n':
+				list_moves.append('STRAIGHT')
+			elif direction=='l':
+				list_moves.append('RIGHT')
+			elif direction=='r':
+				list_moves.append('LEFT')
+			elif direction=='s':
+				list_moves.append('REVERSE')                          
+			direction='n'
+			 
 	##################################################
 
 	return list_moves
