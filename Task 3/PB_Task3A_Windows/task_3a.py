@@ -215,8 +215,6 @@ def detect_paths_to_graph(image):
 	upper_red = np.array([189, 43, 105])
 	path=graph(paths,lower_red,upper_red)
 	paths.update(path)
-	
-
 	##################################################
 
 	return paths
@@ -263,6 +261,8 @@ def detect_arena_parameters(maze_image):
 	arena_parameters["traffic_signals"]=traffic_signals
 	arena_parameters["start_node"]=start_node
 	arena_parameters["end_node"]=end_node
+	arena_parameters["paths"]=detect_paths_to_graph(maze_image)
+
 	##################################################
 	
 	return arena_parameters
@@ -302,6 +302,39 @@ def path_planning(graph, start, end):
 	backtrace_path=[]
 
 	##############	ADD YOUR CODE HERE	##############
+	source = start
+	destination = end
+	unvisited = graph
+	shortest_distances = {}
+	route = []
+	path_nodes = {}
+
+	for nodes in unvisited:
+		shortest_distances[nodes] = np.inf
+	shortest_distances[source] = 0
+
+	while unvisited:
+		min_node = None
+		for current_node in unvisited:
+			if min_node is None:
+				min_node = current_node
+			elif shortest_distances[min_node] \
+				> shortest_distances[current_node]:
+				min_node = current_node
+		for (node, value) in unvisited[min_node].items():
+			if value + shortest_distances[min_node] \
+				< shortest_distances[node]:
+				shortest_distances[node] = value \
+					+ shortest_distances[min_node]
+				path_nodes[node] = min_node
+		unvisited.pop(min_node)
+	node = destination
+
+	while node != source:
+		route.insert(0, node)
+		node = path_nodes[node]
+	route.insert(0, source)
+	backtrace_path=route
 	
 	##################################################
 
