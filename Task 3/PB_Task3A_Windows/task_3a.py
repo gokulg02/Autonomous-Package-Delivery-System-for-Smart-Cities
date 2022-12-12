@@ -31,7 +31,9 @@ import cv2
 ##############################################################
 
 ################# ADD UTILITY FUNCTIONS HERE #################
-col=['A','B','C','D','E','F']
+col=['A','B','C','D','E','F','G','H']
+
+
 
 ##############################################################
 
@@ -157,7 +159,7 @@ def detect_paths_to_graph(image):
 	mask=cv2.inRange(image,lr,ur)
 	for i in range(100,601,100):
 		for j in range(100,601,100):
-			l=dict()
+			l={}
 			if (mask[i-30][j]):
 				s=col[int(j/100)-1]+str(int(i/100)-1)
 				l[s]=1
@@ -176,9 +178,9 @@ def detect_paths_to_graph(image):
 				
 			s=col[int(j/100)-1]+str(int(i/100))
 			paths[s]=l
-			
-	##################################################
-
+	#print(paths)		
+	#for key in sorted(paths):
+		#print(key, paths[key])	
 	return paths
 
 
@@ -411,13 +413,12 @@ if __name__ == "__main__":
 			arena_parameters = detect_arena_parameters(image)
 			print('\n============================================')
 			print("IMAGE: ", file_num)
-			#print(arena_parameters)
 			print(arena_parameters["start_node"], "->>> ", arena_parameters["end_node"] )
 
 			# path planning and getting the moves
 			back_path=path_planning(arena_parameters["paths"], arena_parameters["start_node"], arena_parameters["end_node"])
 			moves=paths_to_moves(back_path, arena_parameters["traffic_signals"])
-			
+
 			print("PATH PLANNED: ", back_path)
 			print("MOVES TO TAKE: ", moves)
 
