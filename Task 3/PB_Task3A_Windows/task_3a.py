@@ -33,7 +33,6 @@ import cv2
 ################# ADD UTILITY FUNCTIONS HERE #################
 col=['A','B','C','D','E','F']
 
-
 ##############################################################
 
 def detect_all_nodes(image):
@@ -418,7 +417,7 @@ if __name__ == "__main__":
 			# path planning and getting the moves
 			back_path=path_planning(arena_parameters["paths"], arena_parameters["start_node"], arena_parameters["end_node"])
 			moves=paths_to_moves(back_path, arena_parameters["traffic_signals"])
-
+			
 			print("PATH PLANNED: ", back_path)
 			print("MOVES TO TAKE: ", moves)
 
