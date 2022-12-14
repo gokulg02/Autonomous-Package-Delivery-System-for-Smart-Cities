@@ -17,6 +17,8 @@ L_PWM_PIN1 = 38
 L_PWM_PIN2 = 40
 R_PWM_PIN2 = 32
 R_PWM_PIN1 = 33
+L_EN = 31
+R_EN = 37
 
 # declare motor pins as output pins
 # motors get input from the PWM pins
@@ -28,6 +30,8 @@ def motor_pin_setup():
     GPIO.setup(R_PWM_PIN2, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(L_PWM_PIN1, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(L_PWM_PIN2, GPIO.OUT, initial=GPIO.LOW)
+    GPIO.setup(L_EN, GPIO.OUT, initial=GPIO.HIGH)
+    GPIO.setup(R_EN, GPIO.OUT, initial=GPIO.HIGH)
 
     # setting initial PWM frequency for all 4 pins
     L_MOTOR1 = GPIO.PWM(L_PWM_PIN1, 100) 
