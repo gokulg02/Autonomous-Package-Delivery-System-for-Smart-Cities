@@ -169,9 +169,13 @@ def set_values(scene_parameters):
     pos=sim.getObjectPosition(aruco_handle,sim.handle_parent)
     x=np.interp(scene_parameters[0],[0,1],[0.955,-0.955])
     y=np.interp(scene_parameters[1],[0,1],[-0.955,0.955])
-    sim.setObjectPosition(aruco_handle,sim.handle_parent,[x,y,pos[2]])
+    a=sim.setObjectPosition(aruco_handle,sim.handle_parent,[x,y,pos[2]])
+    ang=sim.getObjectOrientation(aruco_handle,sim.handle_parent)
+    rad=np.radians(-135)
+    b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[ang[0],ang[1],rad])
 ######################################################################################
     #print(pos)
+    #print(ang)
     return None
 
 if __name__ == "__main__":
