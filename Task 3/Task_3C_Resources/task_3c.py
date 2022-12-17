@@ -67,7 +67,7 @@ def perspective_transform(image):
     ---
     warped_image = perspective_transform(image)
     """   
-    warped_image = [] 
+    
 #################################  ADD YOUR CODE HERE  ###############################
     a,b =task_1b.detect_ArUco_details(image)
     A=[b[3][0][0],b[3][0][1]]
@@ -85,8 +85,8 @@ def perspective_transform(image):
     o = np.float32([[0, 0], [0, maxh - 1], [maxw - 1, maxh - 1],[maxw - 1, 0]])
     M = cv2.getPerspectiveTransform(i,o)
     out = cv2.warpPerspective(img,M,(maxw, maxh),flags=cv2.INTER_LINEAR)
-    cv2.imshow("O",out)
-    cv2.waitKey(0)
+    #cv2.imshow("O",out)
+    #cv2.waitKey(0)
 
 ######################################################################################
 
@@ -132,7 +132,7 @@ def transform_values(image):
     scene_parameters.append(a[5][0][0]/img.shape[0])
     scene_parameters.append(a[5][0][1]/img.shape[1])
     scene_parameters.append(a[5][1])
-    print(scene_parameters)
+    #print(scene_parameters)
 ######################################################################################
 
     return scene_parameters
@@ -166,9 +166,12 @@ def set_values(scene_parameters):
     """   
     aruco_handle = sim.getObject('/aruco_5')
 #################################  ADD YOUR CODE HERE  ###############################
-
+    pos=sim.getObjectPosition(aruco_handle,sim.handle_parent)
+    x=np.interp(scene_parameters[0],[0,1],[0.955,-0.955])
+    y=np.interp(scene_parameters[1],[0,1],[-0.955,0.955])
+    sim.setObjectPosition(aruco_handle,sim.handle_parent,[x,y,pos[2]])
 ######################################################################################
-
+    #print(pos)
     return None
 
 if __name__ == "__main__":
@@ -177,9 +180,10 @@ if __name__ == "__main__":
     task_1b = __import__('task_1b')
     img=cv2.imread(r"C:\Users\Vasumathi T\Downloads\Eyantra\Task 3\Task_3C_Resources\aruco_1.png")
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    cv2.imshow("g",img)
-    cv2.waitKey(0)
-    transform_values(img)
+    #cv2.imshow("g",img)
+    #cv2.waitKey(0)
+    scene_parameters =transform_values(img)
+    set_values(scene_parameters)
 #################################  ADD YOUR CODE HERE  ################################
 
 #######################################################################################
