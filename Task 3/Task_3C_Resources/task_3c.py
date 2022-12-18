@@ -171,7 +171,12 @@ def set_values(scene_parameters):
     y=np.interp(scene_parameters[1],[0,1],[-0.955,0.955])-0.05
     a=sim.setObjectPosition(aruco_handle,sim.handle_parent,[x,y,0.029])
     #ang=sim.getObjectOrientation(aruco_handle,sim.handle_parent)
-    rad=np.radians(-180)
+    ang=scene_parameters[2]
+    if ang<0:
+        ang=np.interp(ang,[-180,0],[0,180])
+    else:
+        ang=np.interp(ang,[0,180],[-180,0])
+    rad=np.radians(ang)
     b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[0,0,rad])
 ######################################################################################
     #print(pos)
@@ -186,8 +191,7 @@ if __name__ == "__main__":
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #cv2.imshow("g",img)
     #cv2.waitKey(0)
-    scene_parameters =transform_values(img)
-    set_values(scene_parameters)
+    set_values(transform_values(img))
 #################################  ADD YOUR CODE HERE  ################################
 
 #######################################################################################
