@@ -28,10 +28,10 @@
 ## modules for this task                                    ##
 ##############################################################
 import cv2 
-import numpy as np
-from  numpy import interp
+import numpy
 from zmqRemoteApi import RemoteAPIClient
 import zmq
+import requests
 ##############################################################
 
 #################################  ADD UTILITY FUNCTIONS HERE  #######################
@@ -75,14 +75,14 @@ def perspective_transform(image):
     C=[b[1][2][0],b[1][2][1]]
     D=[b[4][1][0],b[4][1][1]]
     #print(C)
-    AD = np.sqrt(((A[0] - D[0]) ** 2) + ((A[1] - D[1]) ** 2))
-    BC = np.sqrt(((B[0] - C[0]) ** 2) + ((B[1] - C[1]) ** 2))
+    AD = numpy.sqrt(((A[0] - D[0]) ** 2) + ((A[1] - D[1]) ** 2))
+    BC = numpy.sqrt(((B[0] - C[0]) ** 2) + ((B[1] - C[1]) ** 2))
     maxw = max(int(AD), int(BC))
-    AB = np.sqrt(((A[0] - B[0]) ** 2) + ((A[1] - B[1]) ** 2))
-    CD = np.sqrt(((C[0] - D[0]) ** 2) + ((C[1] - D[1]) ** 2))
+    AB = numpy.sqrt(((A[0] - B[0]) ** 2) + ((A[1] - B[1]) ** 2))
+    CD = numpy.sqrt(((C[0] - D[0]) ** 2) + ((C[1] - D[1]) ** 2))
     maxh = max(int(AB), int(CD))
-    i = np.float32([A,B,C,D])
-    o = np.float32([[0, 0], [0, maxh - 1], [maxw - 1, maxh - 1],[maxw - 1, 0]])
+    i = numpy.float32([A,B,C,D])
+    o = numpy.float32([[0, 0], [0, maxh - 1], [maxw - 1, maxh - 1],[maxw - 1, 0]])
     M = cv2.getPerspectiveTransform(i,o)
     out = cv2.warpPerspective(img,M,(maxw, maxh),flags=cv2.INTER_LINEAR)
     #cv2.imshow("O",out)
@@ -167,16 +167,16 @@ def set_values(scene_parameters):
     aruco_handle = sim.getObject('/aruco_5')
 #################################  ADD YOUR CODE HERE  ###############################
     #pos=sim.getObjectPosition(aruco_handle,sim.handle_parent)
-    x=np.interp(scene_parameters[0],[0,1],[0.955,-0.955])
-    y=np.interp(scene_parameters[1],[0,1],[-0.955,0.955])-0.05
+    x=numpy.interp(scene_parameters[0],[0,1],[0.955,-0.955])
+    y=numpy.interp(scene_parameters[1],[0,1],[-0.955,0.955])
     a=sim.setObjectPosition(aruco_handle,sim.handle_parent,[x,y,0.029])
     #ang=sim.getObjectOrientation(aruco_handle,sim.handle_parent)
     ang=scene_parameters[2]
     if ang<0:
-        ang=np.interp(ang,[-180,0],[0,180])
+        ang=numpy.interp(ang,[-180,0],[0,180])
     else:
-        ang=np.interp(ang,[0,180],[-180,0])
-    rad=np.radians(ang)
+        ang=numpy.interp(ang,[0,180],[-180,0])
+    rad=numpy.radians(ang)
     b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[0,0,rad])
 ######################################################################################
     #print(pos)
@@ -184,14 +184,25 @@ def set_values(scene_parameters):
     return None
 
 if __name__ == "__main__":
+    url="http://192.168.152.71:8080/shot.jpg"
     client = RemoteAPIClient()
     sim = client.getObject('sim')
     task_1b = __import__('task_1b')
-    img=cv2.imread(r"C:\Users\Vasumathi T\Downloads\Eyantra\Task 3\Task_3C_Resources\aruco_1.png")
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #cv2.imshow("g",img)
-    #cv2.waitKey(0)
-    set_values(transform_values(img))
+    #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    while(1):
+        img_resp = requests.get(url)
+        img_arr = numpy.array(bytearray(img_resp.content), dtype=numpy.uint8)
+        img = cv2.imdecode(img_arr, -1)
+        img=cv2.resize(img, (800, 500))
+        
+        cv2.imshow("g",img)
+        cv2.waitKey(1)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        try:
+            set_values(transform_values(img))
+        except:
+            pass
+
 #################################  ADD YOUR CODE HERE  ################################
 
 #######################################################################################
