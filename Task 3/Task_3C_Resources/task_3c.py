@@ -70,11 +70,25 @@ def perspective_transform(image):
     
 #################################  ADD YOUR CODE HERE  ###############################
     a,b =task_1b.detect_ArUco_details(image)
-    A=[b[3][0][0],b[3][0][1]]
-    B=[b[2][3][0],b[2][3][1]]
-    C=[b[1][2][0],b[1][2][1]]
-    D=[b[4][1][0],b[4][1][1]]
-    #print(C)
+    try:
+        A=[b[3][2][0],b[3][2][1]]
+    except:
+        A=None
+    try:
+        B=[b[2][1][0],b[2][1][1]]
+    except:
+        B=None
+    try:
+        C=[b[1][0][0],b[1][0][1]]
+    except:
+        C=None
+    try:
+        D=[b[4][3][0],b[4][3][1]]
+    except:
+        D=None
+    #print(A,B,C,D)
+    if (A==None and B!=None and C!=None and D!=None):
+        A=[B[1],D[0]]
     AD = numpy.sqrt(((A[0] - D[0]) ** 2) + ((A[1] - D[1]) ** 2))
     BC = numpy.sqrt(((B[0] - C[0]) ** 2) + ((B[1] - C[1]) ** 2))
     maxw = max(int(AD), int(BC))
@@ -85,9 +99,9 @@ def perspective_transform(image):
     o = numpy.float32([[0, 0], [0, maxh - 1], [maxw - 1, maxh - 1],[maxw - 1, 0]])
     M = cv2.getPerspectiveTransform(i,o)
     out = cv2.warpPerspective(img,M,(maxw, maxh),flags=cv2.INTER_LINEAR)
-    #cv2.imshow("O",out)
-    #cv2.waitKey(0)
-
+    cv2.imshow("O",out)
+    cv2.waitKey(1)
+    print("perspective")
 ######################################################################################
 
     return out
@@ -128,7 +142,7 @@ def transform_values(image):
 #################################  ADD YOUR CODE HERE  ###############################
     img=perspective_transform(image)
     a,_ =task_1b.detect_ArUco_details(img)
-    #print(a[5][0][0])
+    print("5 detected")
     scene_parameters.append(a[5][0][0]/img.shape[0])
     scene_parameters.append(a[5][0][1]/img.shape[1])
     scene_parameters.append(a[5][1])
@@ -178,6 +192,7 @@ def set_values(scene_parameters):
         ang=numpy.interp(ang,[0,180],[-180,0])
     rad=numpy.radians(ang)
     b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[0,0,rad])
+    print("Emulated")
 ######################################################################################
     #print(pos)
     #print(ang)
@@ -188,16 +203,16 @@ if __name__ == "__main__":
     client = RemoteAPIClient()
     sim = client.getObject('sim')
     task_1b = __import__('task_1b')
+    vid = cv2.VideoCapture(r"C:\Users\Vasumathi T\Downloads\20230102_113749.mp4")
+
     #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     while(1):
-        img_resp = requests.get(url)
-        img_arr = numpy.array(bytearray(img_resp.content), dtype=numpy.uint8)
-        img = cv2.imdecode(img_arr, -1)
+        ret, img = vid.read()
         img=cv2.resize(img, (800, 500))
-        
+        #img=cv2.imread(r"C:\Users\Vasumathi T\Downloads\Eyantra\Task 3\Task_3C_Resources\aruco_1.png")
         cv2.imshow("g",img)
         cv2.waitKey(1)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         try:
             set_values(transform_values(img))
         except:
