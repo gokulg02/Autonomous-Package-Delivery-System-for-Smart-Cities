@@ -69,7 +69,8 @@ def setup_client(host, port):
 	client = None
 
 	##################	ADD YOUR CODE HERE	##################
-
+	client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	client.connect((host,port))
 
 	##########################################################
 
@@ -99,7 +100,8 @@ def receive_message_via_socket(client):
 	message = None
 
 	##################	ADD YOUR CODE HERE	##################
-
+	message = client.recv(10)
+	message = str(message, 'UTF-8')
 
 	##########################################################
 
@@ -130,6 +132,8 @@ def send_message_via_socket(client, message):
 
 	##################	ADD YOUR CODE HERE	##################
 
+	message=res = bytes(message, 'utf-8')
+	client.sendall(message)
 
 	##########################################################
 
@@ -138,7 +142,7 @@ def send_message_via_socket(client, message):
 
 if __name__ == "__main__":
 
-		host = "192.168.1.11"
+		host = "192.168.1.12"
 		port = 5050
 
 
