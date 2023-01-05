@@ -136,7 +136,7 @@ def receive_message_via_socket(connection):
 
 	##################	ADD YOUR CODE HERE	##################
 	message = connection.recv(10)
-
+	message = str(message, 'UTF-8')
 	##########################################################
 
 	return message
@@ -165,6 +165,7 @@ def send_message_via_socket(connection, message):
 	"""
 
 	##################	ADD YOUR CODE HERE	##################
+	message=res = bytes(message, 'utf-8')
 	connection.sendall(message)
 
 	##########################################################
@@ -174,11 +175,11 @@ def send_message_via_socket(connection, message):
 ######### YOU ARE NOT ALLOWED TO MAKE CHANGES TO THE MAIN SECTION #########
 
 if __name__ == "__main__":
-
+		
 		host = ''
 		port = 5050
 
-
+		
 		## Set up new socket server
 		try:
 			server = setup_server(host, port)
