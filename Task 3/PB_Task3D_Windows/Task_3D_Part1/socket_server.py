@@ -68,8 +68,10 @@ def setup_server(host, port):
 	server = None
 
 	##################	ADD YOUR CODE HERE	##################
-	
-
+	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	print("Socket created.")
+	server.bind((host, port))
+	print("Socket bind complete.")
 	##########################################################
 
 	return server
@@ -101,8 +103,10 @@ def setup_connection(server):
 	address = None
 
 	##################	ADD YOUR CODE HERE	##################
-	
-
+	server.listen(3)
+	print("Socket is listening.")
+	connection, address = server.accept()
+	print(f"Connected to {address}")
 	##########################################################
 
 	return connection, address
@@ -131,7 +135,7 @@ def receive_message_via_socket(connection):
 	message = None
 
 	##################	ADD YOUR CODE HERE	##################
-
+	message = connection.recv(10)
 
 	##########################################################
 
@@ -161,7 +165,7 @@ def send_message_via_socket(connection, message):
 	"""
 
 	##################	ADD YOUR CODE HERE	##################
-
+	connection.sendall(message)
 
 	##########################################################
 
