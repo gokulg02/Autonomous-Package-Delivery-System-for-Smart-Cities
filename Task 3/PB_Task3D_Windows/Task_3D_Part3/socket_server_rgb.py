@@ -63,7 +63,15 @@ def read_qr_code(sim):
 	qr_message = None
 	
 	##############  ADD YOUR CODE HERE  ##############
+	visionSensorHandle = sim.getObject('/vision_sensor')
+	img, resX, resY = sim.getVisionSensorCharImage(visionSensorHandle)
+	img = np.frombuffer(img, dtype=np.uint8).reshape(resY, resX, 3)
+	img = cv2.flip(img, 0)
 
+	a=decode(img)
+	for x in a:
+		qr_message=x.data
+		qr_message=str(qr_message)[2:-1]
 
 	##################################################
 
@@ -100,7 +108,10 @@ def setup_server(host, port):
 
 	##################	ADD YOUR CODE HERE	##################
 	
-
+	server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	print("Socket created.")
+	server.bind((host, port))
+	print("Socket bind complete.")
 	##########################################################
 
 	return server
@@ -132,7 +143,10 @@ def setup_connection(server):
 	address = None
 
 	##################	ADD YOUR CODE HERE	##################
-	
+	server.listen(3)
+	print("Socket is listening.")
+	connection, address = server.accept()
+	print(f"Connected to {address}")
 
 	##########################################################
 
@@ -163,7 +177,8 @@ def receive_message_via_socket(connection):
 
 	##################	ADD YOUR CODE HERE	##################
 
-
+	message = connection.recv(10)
+	message = str(message, 'UTF-8')
 	##########################################################
 
 	return message
@@ -192,7 +207,8 @@ def send_message_via_socket(connection, message):
 	"""
 
 	##################	ADD YOUR CODE HERE	##################
-
+	message=res = bytes(message, 'utf-8')
+	connection.sendall(message)
 
 	##########################################################
 
