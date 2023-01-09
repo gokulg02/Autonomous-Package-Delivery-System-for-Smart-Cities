@@ -62,7 +62,8 @@ def detect_traffic_signals(maze_image):
 	traffic_signals = detect_traffic_signals(maze_image)
 	"""    
 	traffic_signals = []
-
+	start=None
+	end=None
 	##############	ADD YOUR CODE HERE	##############
 	for i in range(100,601,100):
 		for j in range(100,601,100):
@@ -72,11 +73,23 @@ def detect_traffic_signals(maze_image):
 				y=str(int(i/100))
 				s=x+y
 				traffic_signals.append(s)
+			elif (((maze_image[i,j]==np.array([0,255,0])).all())):
+				x=int(j/100)
+				x=chr(x+64)
+				y=str(int(i/100))
+				s=x+y
+				start=s
+			elif (((maze_image[i,j]==np.array([189,43,105])).all())):
+				x=int(j/100)
+				x=chr(x+64)
+				y=str(int(i/100))
+				s=x+y
+				end=s
 	
 
 	##################################################
 	
-	return traffic_signals
+	return traffic_signals,start,end
 	
 
 def detect_horizontal_roads_under_construction(maze_image):
@@ -105,7 +118,7 @@ def detect_horizontal_roads_under_construction(maze_image):
 	##############	ADD YOUR CODE HERE	##############
 	for i in range(100,601,100):
 		for j in range(150,551,100):
-			if ((maze_image[i,j]==np.array([0,0,0])).all()):
+			if ((maze_image[i,j]==np.array([255,255,255])).all()):
 				x1=int((j-50)/100)
 				x1=chr(x1+64)
 				x2=int((j+50)/100)
@@ -142,22 +155,16 @@ def detect_vertical_roads_under_construction(maze_image):
 	vertical_roads_under_construction = []
 
 	##############	ADD YOUR CODE HERE	##############
-	for i in range(150,651,100):
-		for j in range(100,751,100):
-			b,g,r=maze_image[i,j]
-			if(b==255 and g==255 and r==255):
-				y1=i-50
-				y1=str(y1)
-				y1=y1[0]
-				y2=i+50
-				y2=str(y2)
-				y2=y2[0]
-				x=j
-				x=str(x)
-				x=int(x[0])+64
-				x=chr(x)
-				vertical_roads_under_construction .append(x+y1+'-'+x+y2)
-	vertical_roads_under_construction .sort()
+
+	for i in range(150,551,100):
+		for j in range(100,601,100):
+			if((maze_image[i,j]==np.array([255,255,255])).all()):
+				x=int(j/100)
+				x=chr(x+64)
+				y1=str(int((i-50)/100))
+				y2=str(int((i+50)/100))
+				s=x+y1+'-'+x+y2
+				vertical_roads_under_construction.append(s)
 	##################################################
 	
 	return vertical_roads_under_construction
@@ -230,12 +237,6 @@ def detect_medicine_packages(maze_image):
 
 	return medicine_packages_present
 
-def detect_start_node(maze_img):
-
-	start=None
-
-	
-	return start
 
 def detect_arena_parameters(maze_image):
 
@@ -269,7 +270,7 @@ def detect_arena_parameters(maze_image):
 	arena_parameters = {}
 
 	##############	ADD YOUR CODE HERE	##############
-	arena_parameters['traffic_signals']=detect_traffic_signals(maze_image)
+	arena_parameters['traffic_signals'],arena_parameters['start_node'],arena_parameters['end_node']=detect_traffic_signals(maze_image)
 	arena_parameters['horizontal_roads_under_construction']=detect_horizontal_roads_under_construction(maze_image)
 	arena_parameters['vertical_roads_under_construction']=detect_vertical_roads_under_construction(maze_image)
 	arena_parameters['medicine_packages']=detect_medicine_packages(maze_image)

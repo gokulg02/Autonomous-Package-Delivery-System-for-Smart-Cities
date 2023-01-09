@@ -269,7 +269,8 @@ if __name__ == "__main__":
     # import task_1a.py. Make sure that task_1a.py is in same folder as task_4a.py
     task_1 = __import__('task_1a')
     detected_arena_parameters = task_1.detect_arena_parameters(config_img)
-
+    print(detected_arena_parameters)
+    '''
     # obtain required arena parameters
     medicine_package_details = detected_arena_parameters["medicine_packages"]
     traffic_signals = detected_arena_parameters['traffic_signals']
@@ -292,7 +293,7 @@ if __name__ == "__main__":
 
     for i in all_models:
         sim.removeModel(i)
-
+    '''
    
     choice = input('\nDo you want to run your script on all test images ? => "y" or "n": ')
     
