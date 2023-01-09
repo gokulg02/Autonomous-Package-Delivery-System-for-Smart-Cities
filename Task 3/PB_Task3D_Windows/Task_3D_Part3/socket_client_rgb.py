@@ -1,4 +1,4 @@
- '''
+'''
 *****************************************************************************************
 *
 *        		===============================================
@@ -35,7 +35,17 @@ GPIO.setwarnings(False)
 ##############################################################
 
 ################# ADD UTILITY FUNCTIONS HERE #################
-
+red_p = 16
+green_p = 13
+blue_p = 18
+GPIO.setup(red_p, GPIO.OUT)# red  
+GPIO.setup(green_p, GPIO.OUT)# green
+GPIO.setup(blue_p, GPIO.OUT)# blue
+	
+red = GPIO.PWM(red_p, 75) 
+green = GPIO.PWM(green_p, 75)
+blue = GPIO.PWM(blue_p, 75)
+	
 
 ##############################################################
 
@@ -69,7 +79,9 @@ def setup_client(host, port):
 	client = None
 
 	##################	ADD YOUR CODE HERE	##################
-	
+	client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	client.connect((host,port))
+
 
 	##########################################################
 
@@ -100,6 +112,8 @@ def receive_message_via_socket(client):
 
 	##################	ADD YOUR CODE HERE	##################
 
+	message = client.recv(10)
+	message = str(message, 'UTF-8')
 
 	##########################################################
 
@@ -129,6 +143,8 @@ def send_message_via_socket(client, message):
 	"""
 
 	##################	ADD YOUR CODE HERE	##################
+	message=res = bytes(message, 'utf-8')
+	client.sendall(message)
 
 
 	##########################################################
@@ -154,8 +170,7 @@ def rgb_led_setup():
 	"""
 
 	##################	ADD YOUR CODE HERE	##################
-
-	
+	pass
 	##########################################################
 	
 def rgb_led_set_color(color):
@@ -183,13 +198,16 @@ def rgb_led_set_color(color):
 	"""    
 
 	##################	ADD YOUR CODE HERE	##################
-
+	pwm_values = {"Red": (255, 0, 0), "Blue": (0, 0, 255), "Green": (0, 255, 0), "Orange": (255, 35, 0), "Pink": (255, 0, 122), "Sky Blue": (0, 100, 100)}
+	red.start((pwm_values[message][0]/2.55))
+	green.start((pwm_values[message][1]/2.55))
+	blue.start((pwm_values[message][2]/2.55))
 	
 	##########################################################
 
 if __name__ == "__main__":
 
-		host = "192.168.1.11"
+		host = "192.168.1.4"
 		port = 5050
 
 		## 
