@@ -94,6 +94,24 @@ def place_packages(medicine_package_details, sim, all_models):
     packages_models_directory = os.path.join(models_directory, "package_models")
     arena = sim.getObject('/Arena')    
 ####################### ADD YOUR CODE HERE #########################
+    keys=medicine_package_details.keys()
+    y=0.684
+    for i in keys:
+        l=medicine_package_details[i]
+        x=-0.89+0.356*(i-1)+0.0445
+        for j in l:
+            dir=j+".ttm"
+            dir=os.path.join(packages_models_directory,dir)
+            objectHandle=sim.loadModel(dir)
+            sim.setObjectParent(objectHandle,arena,True)
+            p=[x,y,0.002]
+            sim.setObjectPosition(objectHandle,arena,p)
+            all_models.append(objectHandle)
+            sim.setObjectAlias(objectHandle,j)
+            x=x+0.089
+
+
+        
 
 ####################################################################
     return all_models
@@ -250,7 +268,7 @@ def place_horizontal_barricade(horizontal_roads_under_construction, sim, all_mod
         p.append((p1[1]+p2[1])/2)
         p.append(0.002)
         sim.setObjectPosition(objectHandle,arena,p)
-        sim.setObjectAlias(objectHandle,'Horizontal_missing_node_'+i[:2]+'_'+i[-2:])
+        sim.setObjectAlias(objectHandle,'Horizontal_missing_road_'+i[:2]+'_'+i[-2:])
         all_models.append(objectHandle)
     
 
@@ -306,7 +324,7 @@ def place_vertical_barricade(vertical_roads_under_construction, sim, all_models)
         p.append((p1[1]+p2[1])/2)
         p.append(0.002)
         sim.setObjectPosition(objectHandle,arena,p)
-        sim.setObjectAlias(objectHandle,'Vertical_missing_node_'+i[:2]+'_'+i[-2:])
+        sim.setObjectAlias(objectHandle,'Vertical_missing_road_'+i[:2]+'_'+i[-2:])
         all_models.append(objectHandle)
 
 ####################################################################
