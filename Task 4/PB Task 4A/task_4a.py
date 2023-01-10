@@ -38,7 +38,15 @@ import time
 ##############################################################
 
 ################# ADD UTILITY FUNCTIONS HERE #################
-
+def get_coord(node):
+    x=node[0]
+    x=ord(x)-65
+    x=-0.89+0.356*x
+    y=node[1]
+    y=int(y)-1
+    y=0.89-0.356*y
+    l=[x,y]
+    return l
 ##############################################################
 
 def place_packages(medicine_package_details, sim, all_models):
@@ -120,7 +128,13 @@ def place_traffic_signals(traffic_signals, sim, all_models):
     traffic_sig_model = os.path.join(models_directory, "signals", "traffic_signal.ttm" )
     arena = sim.getObject('/Arena')   
 ####################### ADD YOUR CODE HERE #########################
-    
+    for i in traffic_signals:
+        objectHandle=sim.loadModel(traffic_sig_model)
+        sim.setObjectParent(objectHandle,arena,True)
+        p=get_coord(i)
+        p.append(0.2)
+        sim.setObjectPosition(objectHandle,arena,p)
+        all_models.append(objectHandle)
 ####################################################################
     return all_models
 
@@ -162,7 +176,21 @@ def place_start_end_nodes(start_node, end_node, sim, all_models):
     end_node_model = os.path.join(models_directory, "signals", "end_node.ttm" )
     arena = sim.getObject('/Arena')   
 ####################### ADD YOUR CODE HERE #########################
-    
+    objectHandle=sim.loadModel(start_node_model)
+    sim.setObjectParent(objectHandle,arena,True)
+    p=get_coord(start_node)
+    p.append(0.2)
+    sim.setObjectPosition(objectHandle,arena,p)
+    all_models.append(objectHandle)
+
+    objectHandle=sim.loadModel(end_node_model)
+    sim.setObjectParent(objectHandle,arena,True)
+    p=get_coord(end_node)
+    p.append(0.2)
+    sim.setObjectPosition(objectHandle,arena,p)
+    all_models.append(objectHandle)
+
+
 ####################################################################
     return all_models
 
@@ -203,7 +231,19 @@ def place_horizontal_barricade(horizontal_roads_under_construction, sim, all_mod
     horiz_barricade_model = os.path.join(models_directory, "barricades", "horizontal_barricade.ttm" )
     arena = sim.getObject('/Arena')  
 ####################### ADD YOUR CODE HERE #########################
+    for i in horizontal_roads_under_construction:
+        objectHandle=sim.loadModel(horiz_barricade_model)
+        sim.setObjectParent(objectHandle,arena,True)
+        p1=get_coord(i[:2])
+        p2=get_coord(i[-2:])
+        p=[]
+        p.append((p1[0]+p2[0])/2)
+        p.append((p1[1]+p2[1])/2)
+        p.append(0.0025)
+        sim.setObjectPosition(objectHandle,arena,p)
+        all_models.append(objectHandle)
     
+
 ####################################################################
     return all_models
 
@@ -246,6 +286,18 @@ def place_vertical_barricade(vertical_roads_under_construction, sim, all_models)
     arena = sim.getObject('/Arena') 
 ####################### ADD YOUR CODE HERE #########################
     
+    for i in vertical_roads_under_construction:
+        objectHandle=sim.loadModel(vert_barricade_model)
+        sim.setObjectParent(objectHandle,arena,True)
+        p1=get_coord(i[:2])
+        p2=get_coord(i[-2:])
+        p=[]
+        p.append((p1[0]+p2[0])/2)
+        p.append((p1[1]+p2[1])/2)
+        p.append(0.0025)
+        sim.setObjectPosition(objectHandle,arena,p)
+        all_models.append(objectHandle)
+
 ####################################################################
     return all_models
 
@@ -269,8 +321,7 @@ if __name__ == "__main__":
     # import task_1a.py. Make sure that task_1a.py is in same folder as task_4a.py
     task_1 = __import__('task_1a')
     detected_arena_parameters = task_1.detect_arena_parameters(config_img)
-    print(detected_arena_parameters)
-    '''
+
     # obtain required arena parameters
     medicine_package_details = detected_arena_parameters["medicine_packages"]
     traffic_signals = detected_arena_parameters['traffic_signals']
@@ -293,7 +344,7 @@ if __name__ == "__main__":
 
     for i in all_models:
         sim.removeModel(i)
-    '''
+
    
     choice = input('\nDo you want to run your script on all test images ? => "y" or "n": ')
     
