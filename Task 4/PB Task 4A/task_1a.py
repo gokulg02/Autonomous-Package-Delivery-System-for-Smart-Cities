@@ -47,7 +47,6 @@ def detect_traffic_signals(maze_image):
 	---
 	This function takes the image as an argument and returns a list of
 	nodes in which traffic signals are present in the image
-
 	Input Arguments:
 	---
 	`maze_image` :	[ numpy array ]
@@ -99,7 +98,6 @@ def detect_horizontal_roads_under_construction(maze_image):
 	---
 	This function takes the image as an argument and returns a list
 	containing the missing horizontal links
-
 	Input Arguments:
 	---
 	`maze_image` :	[ numpy array ]
@@ -138,7 +136,6 @@ def detect_vertical_roads_under_construction(maze_image):
 	---
 	This function takes the image as an argument and returns a list
 	containing the missing vertical links
-
 	Input Arguments:
 	---
 	`maze_image` :	[ numpy array ]
@@ -177,12 +174,10 @@ def detect_medicine_packages(maze_image):
 	---
 	This function takes the image as an argument and returns a nested list of
 	details of the medicine packages placed in different shops
-
 	** Please note that the shop packages should be sorted in the ASCENDING order of shop numbers 
 	   as well as in the alphabetical order of colors.
 	   For example, the list should first have the packages of shop_1 listed. 
 	   For the shop_1 packages, the packages should be sorted in the alphabetical order of color ie Green, Orange, Pink and Skyblue.
-
 	Input Arguments:
 	---
 	`maze_image` :	[ numpy array ]
@@ -200,10 +195,10 @@ def detect_medicine_packages(maze_image):
 	---
 	medicine_packages = detect_medicine_packages(maze_image)
 	"""    
-	medicine_packages_present = []
+	medicine_packages_present = {}
 
 	##############	ADD YOUR CODE HERE	##############
-	frame=maze_image[0:200,0:800]
+	frame=maze_image[0:200,0:700]
 	lower_sb = np.array([255, 255, 0])
 	uppper_sb = np.array([255, 255, 0])
 	sky_blue= cv2.inRange(frame, lower_sb, uppper_sb)
@@ -227,12 +222,11 @@ def detect_medicine_packages(maze_image):
 			x=str(cX)
 			x=x[0]
 			if len(c)==3:
-				medicine_packages_present.append(['Shop_'+x,i,'Triangle',[cX,cY]])
+				medicine_packages_present.setdefault(int(x), []).append(i+'_cone')
 			elif len(c)==4:
-				medicine_packages_present.append(['Shop_'+x,i,'Square',[cX,cY]])
+				medicine_packages_present.setdefault(int(x), []).append(i+'_cube')
 			else:
-				medicine_packages_present.append(['Shop_'+x,i,'Circle',[cX,cY]])    
-	medicine_packages_present.sort()
+				medicine_packages_present.setdefault(int(x), []).append(i+'_cylinder')   
 	##################################################
 
 	return medicine_packages_present
@@ -245,15 +239,12 @@ def detect_arena_parameters(maze_image):
 	---
 	This function takes the image as an argument and returns a dictionary
 	containing the details of the different arena parameters in that image
-
 	The arena parameters are of four categories:
 	i) traffic_signals : list of nodes having a traffic signal
 	ii) horizontal_roads_under_construction : list of missing horizontal links
 	iii) vertical_roads_under_construction : list of missing vertical links
 	iv) medicine_packages : list containing details of medicine packages
-
 	These four categories constitute the four keys of the dictionary
-
 	Input Arguments:
 	---
 	`maze_image` :	[ numpy array ]
