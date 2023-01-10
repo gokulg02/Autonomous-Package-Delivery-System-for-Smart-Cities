@@ -1,323 +1,398 @@
 '''
 *****************************************************************************************
 *
-*        		===============================================
-*           		Pharma Bot (PB) Theme (eYRC 2022-23)
-*        		===============================================
+*        =================================================
+*             Pharma Bot Theme (eYRC 2022-23)
+*        =================================================
 *
-*  This script is to implement Task 1A of Pharma Bot (PB) Theme (eYRC 2022-23).
-*  
+*  This script is intended for implementation of Task 4A
+*  of Pharma Bot (PB) Theme (eYRC 2022-23).
+*
+*  Filename:			task_4a.py
+*  Created:
+*  Last Modified:		02/01/2023
+*  Author:				e-Yantra Team
+*
 *  This software is made available on an "AS IS WHERE IS BASIS".
 *  Licensee/end user indemnifies and will keep e-Yantra indemnified from
-*  any and all claim(s) that emanate from the use of the Software or 
+*  any and all claim(s) that emanate from the use of the Software or
 *  breach of the terms of this agreement.
 *
 *****************************************************************************************
 '''
 
-# Team ID:		    2503
-# Author List:	    Naveen,Gokul,Jashwin,vinisha
-# Filename:			task_1a.py
-# Functions:		detect_traffic_signals, detect_horizontal_roads_under_construction, detect_vertical_roads_under_construction,
-#					detect_medicine_packages, detect_arena_parameters
-# 					[ Comma separated list of functions in this file ]
-
-
+# Team ID:			[ Team-ID ]
+# Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
+# Filename:			task_4a.py
+# Functions:		[ Comma separated list of functions in this file ]
+# 					
 ####################### IMPORT MODULES #######################
 ## You are not allowed to make any changes in this section. ##
-## You have to implement this task with the three available ##
-## modules for this task (numpy, opencv)                    ##
 ##############################################################
-import cv2
 import numpy as np
+import cv2
+from zmqRemoteApi import RemoteAPIClient
+import zmq
+import os
+import time
 ##############################################################
 
 ################# ADD UTILITY FUNCTIONS HERE #################
-
-
-
-
-
+def get_coord(node):
+    x=node[0]
+    x=ord(x)-65
+    x=-0.89+0.356*x
+    y=node[1]
+    y=int(y)-1
+    y=0.89-0.356*y
+    l=[x,y]
+    return l
 ##############################################################
 
-def detect_traffic_signals(maze_image):
-
-	"""
+def place_packages(medicine_package_details, sim, all_models):
+    """
 	Purpose:
 	---
-	This function takes the image as an argument and returns a list of
-	nodes in which traffic signals are present in the image
+	This function takes details (colour, shape and shop) of the packages present in 
+    the arena (using "detect_arena_parameters" function from task_1a.py) and places
+    them on the virtual arena. The packages should be inserted only into the 
+    designated areas in each shop as mentioned in the Task document.
+
+    Functions from Regular API References should be used to set the position of the 
+    packages.
+
 	Input Arguments:
 	---
-	`maze_image` :	[ numpy array ]
-			numpy array of image returned by cv2 library
+	`medicine_package_details` :	[ list ]
+                                nested list containing details of the medicine packages present.
+                                Each element of this list will contain 
+                                - Shop number as Shop_n
+                                - Color of the package as a string
+                                - Shape of the package as a string
+                                - Centroid co-ordinates of the package			
+
+    `sim` : [ object ]
+            ZeroMQ RemoteAPI object
+
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
 	Returns:
+
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
+	
+	Example call:
+	---
+	all_models = place_packages(medicine_package_details, sim, all_models)
+	"""
+    '''
+    medicine_packages': [['Shop_1', 'Green', 'Square', [130, 130]], ['Shop_1', 'Orange', 'Square', [130, 170]], ['Shop_1', 'Pink', 'Square', [170, 130]], ['Shop_1', 'Skyblue', 'Square', [170, 170]], ['Shop_2', 'Green', 'Triangle', [270, 130]], ['Shop_2', 'Orange', 'Triangle', [270, 170]], ['Shop_6', 'Green', 'Circle', [630, 170]], ['Shop_6', 'Pink', 'Circle', [670, 170]], ['Shop_6', 'Skyblue', 'Circle', [670, 130]]]
+    
+    '''
+
+    models_directory = os.getcwd()
+    packages_models_directory = os.path.join(models_directory, "package_models")
+    arena = sim.getObject('/Arena')    
+####################### ADD YOUR CODE HERE #########################
+
+####################################################################
+    return all_models
+
+def place_traffic_signals(traffic_signals, sim, all_models):
+    """
+	Purpose:
+	---
+	This function takes position of the traffic signals present in 
+    the arena (using "detect_arena_parameters" function from task_1a.py) and places
+    them on the virtual arena. The signal should be inserted at a particular node.
+
+    Functions from Regular API References should be used to set the position of the 
+    signals.
+
+	Input Arguments:
 	---
 	`traffic_signals` : [ list ]
 			list containing nodes in which traffic signals are present
+
+    `sim` : [ object ]
+            ZeroMQ RemoteAPI object
+
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
+	Returns:
+
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
+	None
 	
 	Example call:
 	---
-	traffic_signals = detect_traffic_signals(maze_image)
-	"""    
-	traffic_signals = []
-	start=None
-	end=None
-	##############	ADD YOUR CODE HERE	##############
-	for i in range(100,601,100):
-		for j in range(100,601,100):
-			if ((maze_image[i,j]==np.array([0,0,255])).all()):
-				x=int(j/100)
-				x=chr(x+64)
-				y=str(int(i/100))
-				s=x+y
-				traffic_signals.append(s)
-			elif (((maze_image[i,j]==np.array([0,255,0])).all())):
-				x=int(j/100)
-				x=chr(x+64)
-				y=str(int(i/100))
-				s=x+y
-				start=s
-			elif (((maze_image[i,j]==np.array([189,43,105])).all())):
-				x=int(j/100)
-				x=chr(x+64)
-				y=str(int(i/100))
-				s=x+y
-				end=s
-	
-
-	##################################################
-	
-	return traffic_signals,start,end
-	
-
-def detect_horizontal_roads_under_construction(maze_image):
-	
+	all_models = place_traffic_signals(traffic_signals, sim, all_models)
 	"""
+    models_directory = os.getcwd()
+    traffic_sig_model = os.path.join(models_directory, "signals", "traffic_signal.ttm" )
+    arena = sim.getObject('/Arena')   
+####################### ADD YOUR CODE HERE #########################
+    for i in traffic_signals:
+        objectHandle=sim.loadModel(traffic_sig_model)
+        sim.setObjectParent(objectHandle,arena,True)
+        p=get_coord(i)
+        p.append(0.15588)
+        sim.setObjectPosition(objectHandle,arena,p)
+        all_models.append(objectHandle)
+        sim.setObjectAlias(objectHandle,'Signal_'+i)
+####################################################################
+    return all_models
+
+def place_start_end_nodes(start_node, end_node, sim, all_models):
+    """
 	Purpose:
 	---
-	This function takes the image as an argument and returns a list
-	containing the missing horizontal links
+	This function takes position of start and end nodes present in 
+    the arena and places them on the virtual arena. 
+    The models should be inserted at a particular node.
+
+    Functions from Regular API References should be used to set the position of the 
+    start and end nodes.
+
 	Input Arguments:
 	---
-	`maze_image` :	[ numpy array ]
-			numpy array of image returned by cv2 library
+	`start_node` : [ string ]
+    `end_node` : [ string ]
+					
+
+    `sim` : [ object ]
+            ZeroMQ RemoteAPI object
+
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
 	Returns:
+
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
+	---
+	None
+	
+	Example call:
+	---
+	all_models = place_start_end_nodes(start_node, end_node, sim, all_models)
+	"""
+    models_directory = os.getcwd()
+    start_node_model = os.path.join(models_directory, "signals", "start_node.ttm" )
+    end_node_model = os.path.join(models_directory, "signals", "end_node.ttm" )
+    arena = sim.getObject('/Arena')   
+####################### ADD YOUR CODE HERE #########################
+    objectHandle=sim.loadModel(start_node_model)
+    sim.setObjectParent(objectHandle,arena,True)
+    p=get_coord(start_node)
+    p.append(0.15588)
+    sim.setObjectPosition(objectHandle,arena,p)
+    all_models.append(objectHandle)
+    sim.setObjectAlias(objectHandle,'Start_Node')
+
+
+    objectHandle=sim.loadModel(end_node_model)
+    sim.setObjectParent(objectHandle,arena,True)
+    p=get_coord(end_node)
+    p.append(0.15588)
+    sim.setObjectPosition(objectHandle,arena,p)
+    all_models.append(objectHandle)
+    sim.setObjectAlias(objectHandle,'End_Node')
+
+
+####################################################################
+    return all_models
+
+def place_horizontal_barricade(horizontal_roads_under_construction, sim, all_models):
+    """
+	Purpose:
+	---
+	This function takes the list of missing horizontal roads present in 
+    the arena (using "detect_arena_parameters" function from task_1a.py) and places
+    horizontal barricades on virtual arena. The barricade should be inserted 
+    between two nodes as shown in Task document.
+
+    Functions from Regular API References should be used to set the position of the 
+    horizontal barricades.
+
+	Input Arguments:
 	---
 	`horizontal_roads_under_construction` : [ list ]
-			list containing missing horizontal links
+			list containing missing horizontal links		
+
+    `sim` : [ object ]
+            ZeroMQ RemoteAPI object
+
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
+	Returns:
+
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
+	---
+	None
 	
 	Example call:
 	---
-	horizontal_roads_under_construction = detect_horizontal_roads_under_construction(maze_image)
-	"""    
-	horizontal_roads_under_construction = []
-
-	##############	ADD YOUR CODE HERE	##############
-	for i in range(100,601,100):
-		for j in range(150,551,100):
-			if ((maze_image[i,j]==np.array([255,255,255])).all()):
-				x1=int((j-50)/100)
-				x1=chr(x1+64)
-				x2=int((j+50)/100)
-				x2=chr(x2+64)
-				y=str(int(i/100))
-				s=x1+y+'-'+x2+y
-				horizontal_roads_under_construction.append(s)
-				
-	##################################################
-	
-	return horizontal_roads_under_construction	
-
-def detect_vertical_roads_under_construction(maze_image):
-
+	all_models = place_horizontal_barricade(horizontal_roads_under_construction, sim, all_models)
 	"""
+    models_directory = os.getcwd()
+    horiz_barricade_model = os.path.join(models_directory, "barricades", "horizontal_barricade.ttm" )
+    arena = sim.getObject('/Arena')  
+####################### ADD YOUR CODE HERE #########################
+    for i in horizontal_roads_under_construction:
+        objectHandle=sim.loadModel(horiz_barricade_model)
+        sim.setObjectParent(objectHandle,arena,True)
+        p1=get_coord(i[:2])
+        p2=get_coord(i[-2:])
+        p=[]
+        p.append((p1[0]+p2[0])/2)
+        p.append((p1[1]+p2[1])/2)
+        p.append(0.002)
+        sim.setObjectPosition(objectHandle,arena,p)
+        sim.setObjectAlias(objectHandle,'Horizontal_missing_node_'+i[:2]+'_'+i[-2:])
+        all_models.append(objectHandle)
+    
+
+####################################################################
+    return all_models
+
+
+def place_vertical_barricade(vertical_roads_under_construction, sim, all_models):
+    """
 	Purpose:
 	---
-	This function takes the image as an argument and returns a list
-	containing the missing vertical links
+	This function takes the list of missing vertical roads present in 
+    the arena (using "detect_arena_parameters" function from task_1a.py) and places
+    vertical barricades on virtual arena. The barricade should be inserted 
+    between two nodes as shown in Task document.
+
+    Functions from Regular API References should be used to set the position of the 
+    vertical barricades.
+
 	Input Arguments:
-	---
-	`maze_image` :	[ numpy array ]
-			numpy array of image returned by cv2 library
-	Returns:
 	---
 	`vertical_roads_under_construction` : [ list ]
-			list containing missing vertical links
-	
-	Example call:
-	---
-	vertical_roads_under_construction = detect_vertical_roads_under_construction(maze_image)
-	"""    
-	vertical_roads_under_construction = []
+			list containing missing vertical links		
 
-	##############	ADD YOUR CODE HERE	##############
+    `sim` : [ object ]
+            ZeroMQ RemoteAPI object
 
-	for i in range(150,551,100):
-		for j in range(100,601,100):
-			if((maze_image[i,j]==np.array([255,255,255])).all()):
-				x=int(j/100)
-				x=chr(x+64)
-				y1=str(int((i-50)/100))
-				y2=str(int((i+50)/100))
-				s=x+y1+'-'+x+y2
-				vertical_roads_under_construction.append(s)
-	##################################################
-	
-	return vertical_roads_under_construction
-
-
-def detect_medicine_packages(maze_image):
-
-	"""
-	Purpose:
-	---
-	This function takes the image as an argument and returns a nested list of
-	details of the medicine packages placed in different shops
-	** Please note that the shop packages should be sorted in the ASCENDING order of shop numbers 
-	   as well as in the alphabetical order of colors.
-	   For example, the list should first have the packages of shop_1 listed. 
-	   For the shop_1 packages, the packages should be sorted in the alphabetical order of color ie Green, Orange, Pink and Skyblue.
-	Input Arguments:
-	---
-	`maze_image` :	[ numpy array ]
-			numpy array of image returned by cv2 library
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
 	Returns:
+
+    `all_models` : [ list ]
+            list containing handles of all the models imported into the scene
 	---
-	`medicine_packages` : [ list ]
-			nested list containing details of the medicine packages present.
-			Each element of this list will contain 
-			- Shop number as Shop_n
-			- Color of the package as a string
-			- Shape of the package as a string
-			- Centroid co-ordinates of the package
+	None
+	
 	Example call:
 	---
-	medicine_packages = detect_medicine_packages(maze_image)
-	"""    
-	medicine_packages_present = {}
-
-	##############	ADD YOUR CODE HERE	##############
-	frame=maze_image[0:200,0:700]
-	lower_sb = np.array([255, 255, 0])
-	uppper_sb = np.array([255, 255, 0])
-	sky_blue= cv2.inRange(frame, lower_sb, uppper_sb)
-	lower_pink = np.array([180, 0, 255])
-	uppper_pink = np.array([180, 0, 255])
-	pink= cv2.inRange(frame, lower_pink, uppper_pink)
-	lower_orange = np.array([0, 127, 255])
-	uppper_orange = np.array([0,127, 255])
-	orange= cv2.inRange(frame, lower_orange, uppper_orange)
-	lower_green = np.array([0, 255, 0])
-	uppper_green = np.array([0, 255, 0])
-	green= cv2.inRange(frame, lower_green, uppper_green)
-	mask={'Green':green,'Orange':orange,'Pink':pink,'Skyblue':sky_blue}
-	for i in mask:
-		cnts = cv2.findContours(mask[i], cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-		for c in cnts[0]:
-			c = cv2.approxPolyDP(c, 0.01 * cv2.arcLength(c, True), True)
-			M = cv2.moments(c)
-			cX = int(M["m10"] / M["m00"])
-			cY = int(M["m01"] / M["m00"])
-			x=str(cX)
-			x=x[0]
-			if len(c)==3:
-				medicine_packages_present.setdefault(int(x), []).append(i+'_cone')
-			elif len(c)==4:
-				medicine_packages_present.setdefault(int(x), []).append(i+'_cube')
-			else:
-				medicine_packages_present.setdefault(int(x), []).append(i+'_cylinder')   
-	##################################################
-
-	return medicine_packages_present
-
-
-def detect_arena_parameters(maze_image):
-
+	all_models = place_vertical_barricade(vertical_roads_under_construction, sim, all_models)
 	"""
-	Purpose:
-	---
-	This function takes the image as an argument and returns a dictionary
-	containing the details of the different arena parameters in that image
-	The arena parameters are of four categories:
-	i) traffic_signals : list of nodes having a traffic signal
-	ii) horizontal_roads_under_construction : list of missing horizontal links
-	iii) vertical_roads_under_construction : list of missing vertical links
-	iv) medicine_packages : list containing details of medicine packages
-	These four categories constitute the four keys of the dictionary
-	Input Arguments:
-	---
-	`maze_image` :	[ numpy array ]
-			numpy array of image returned by cv2 library
-	Returns:
-	---
-	`arena_parameters` : { dictionary }
-			dictionary containing details of the arena parameters
-	
-	Example call:
-	---
-	arena_parameters = detect_arena_parameters(maze_image)
-	"""    
-	arena_parameters = {}
+    models_directory = os.getcwd()
+    vert_barricade_model = os.path.join(models_directory, "barricades", "vertical_barricade.ttm" )
+    arena = sim.getObject('/Arena') 
+####################### ADD YOUR CODE HERE #########################
+    
+    for i in vertical_roads_under_construction:
+        objectHandle=sim.loadModel(vert_barricade_model)
+        sim.setObjectParent(objectHandle,arena,True)
+        p1=get_coord(i[:2])
+        p2=get_coord(i[-2:])
+        p=[]
+        p.append((p1[0]+p2[0])/2)
+        p.append((p1[1]+p2[1])/2)
+        p.append(0.002)
+        sim.setObjectPosition(objectHandle,arena,p)
+        sim.setObjectAlias(objectHandle,'Vertical_missing_node_'+i[:2]+'_'+i[-2:])
+        all_models.append(objectHandle)
 
-	##############	ADD YOUR CODE HERE	##############
-	arena_parameters['traffic_signals'],arena_parameters['start_node'],arena_parameters['end_node']=detect_traffic_signals(maze_image)
-	arena_parameters['horizontal_roads_under_construction']=detect_horizontal_roads_under_construction(maze_image)
-	arena_parameters['vertical_roads_under_construction']=detect_vertical_roads_under_construction(maze_image)
-	arena_parameters['medicine_packages']=detect_medicine_packages(maze_image)
-	##################################################
-	
-	return arena_parameters
-
-
-######### YOU ARE NOT ALLOWED TO MAKE CHANGES TO THIS FUNCTION #########	
+####################################################################
+    return all_models
 
 if __name__ == "__main__":
+    client = RemoteAPIClient()
+    sim = client.getObject('sim')
 
     # path directory of images in test_images folder
-	img_dir_path = "public_test_images/"
+    img_dir = os.getcwd() + "\\test_imgs\\"
 
-    # path to 'maze_0.png' image file
-	file_num = 0
-	img_file_path = img_dir_path + 'maze_' + str(file_num) + '.png'
-	
-	# read image using opencv
-	maze_image = cv2.imread(img_file_path)
-	
-	print('\n============================================')
-	print('\nFor maze_' + str(file_num) + '.png')
+    i = 0
+    config_img = cv2.imread(img_dir + 'maze_' + str(i) + '.png')
 
-	# detect and print the arena parameters from the image
-	arena_parameters = detect_arena_parameters(maze_image)
+    print('\n============================================')
+    print('\nFor maze_0.png')
 
-	print("Arena Prameters: " , arena_parameters)
+    # object handles of each model that gets imported to the scene can be stored in this list
+    # at the end of each test image, all the models will be removed    
+    all_models = []
 
-	# display the maze image
-	cv2.imshow("image", maze_image)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
+    # import task_1a.py. Make sure that task_1a.py is in same folder as task_4a.py
+    task_1 = __import__('task_1a')
+    detected_arena_parameters = task_1.detect_arena_parameters(config_img)
 
-	choice = input('\nDo you want to run your script on all test images ? => "y" or "n": ')
-	
-	if choice == 'y':
+    # obtain required arena parameters
+    medicine_package_details = detected_arena_parameters["medicine_packages"]
+    traffic_signals = detected_arena_parameters['traffic_signals']
+    start_node = detected_arena_parameters['start_node']
+    end_node = detected_arena_parameters['end_node']
+    horizontal_roads_under_construction = detected_arena_parameters['horizontal_roads_under_construction']
+    vertical_roads_under_construction = detected_arena_parameters['vertical_roads_under_construction'] 
 
-		for file_num in range(1, 15):
-			
-			# path to maze image file
-			img_file_path = img_dir_path + 'maze_' + str(file_num) + '.png'
-			
-			# read image using opencv
-			maze_image = cv2.imread(img_file_path)
-	
-			print('\n============================================')
-			print('\nFor maze_' + str(file_num) + '.png')
-			
-			# detect and print the arena parameters from the image
-			arena_parameters = detect_arena_parameters(maze_image)
+    print("[1] Setting up the scene in CoppeliaSim")
+    all_models = place_packages(medicine_package_details, sim, all_models)
+    all_models = place_traffic_signals(traffic_signals, sim, all_models)
+    all_models = place_horizontal_barricade(horizontal_roads_under_construction, sim, all_models)
+    all_models = place_vertical_barricade(vertical_roads_under_construction, sim, all_models)
+    all_models = place_start_end_nodes(start_node, end_node, sim, all_models)
+    print("[2] Completed setting up the scene in CoppeliaSim")
 
-			print("Arena Parameter: ", arena_parameters)
-				
-			# display the test image
-			cv2.imshow("image", maze_image)
-			cv2.waitKey(2000)
-			cv2.destroyAllWindows()
+    # wait for 10 seconds and then remove models
+    time.sleep(10)
+    print("[3] Removing models for maze_0.png")
+
+    for i in all_models:
+        sim.removeModel(i)
+
+   
+    choice = input('\nDo you want to run your script on all test images ? => "y" or "n": ')
+    
+    if choice == 'y':
+        for i in range(1,5):
+
+            print('\n============================================')
+            print('\nFor maze_' + str(i) +'.png')
+            config_img = cv2.imread(img_dir + 'maze_' + str(i) + '.png')
+
+            # object handles of each model that gets imported to the scene can be stored in this list
+            # at the end of each test image, all the models will be removed    
+            all_models = []
+
+            # import task_1a.py. Make sure that task_1a.py is in same folder as task_4a.py
+            task_1 = __import__('task_1a')
+            detected_arena_parameters = task_1.detect_arena_parameters(config_img)
+
+            # obtain required arena parameters
+            medicine_package_details = detected_arena_parameters["medicine_packages"]
+            traffic_signals = detected_arena_parameters['traffic_signals']
+            start_node = detected_arena_parameters['start_node']
+            end_node = detected_arena_parameters['end_node']
+            horizontal_roads_under_construction = detected_arena_parameters['horizontal_roads_under_construction']
+            vertical_roads_under_construction = detected_arena_parameters['vertical_roads_under_construction'] 
+
+            print("[1] Setting up the scene in CoppeliaSim")
+            place_packages(medicine_package_details, sim, all_models)
+            place_traffic_signals(traffic_signals, sim, all_models)
+            place_horizontal_barricade(horizontal_roads_under_construction, sim, all_models)
+            place_vertical_barricade(vertical_roads_under_construction, sim, all_models)
+            place_start_end_nodes(start_node, end_node, sim, all_models)
+            print("[2] Completed setting up the scene in CoppeliaSim")
+
+            # wait for 10 seconds and then remove models
+            time.sleep(10)
+            print("[3] Removing models for maze_" + str(i) + '.png')
+            for i in all_models:
+                sim.removeModel(i)
+            
