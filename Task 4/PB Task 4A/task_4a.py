@@ -85,6 +85,11 @@ def place_packages(medicine_package_details, sim, all_models):
 	---
 	all_models = place_packages(medicine_package_details, sim, all_models)
 	"""
+    '''
+    medicine_packages': [['Shop_1', 'Green', 'Square', [130, 130]], ['Shop_1', 'Orange', 'Square', [130, 170]], ['Shop_1', 'Pink', 'Square', [170, 130]], ['Shop_1', 'Skyblue', 'Square', [170, 170]], ['Shop_2', 'Green', 'Triangle', [270, 130]], ['Shop_2', 'Orange', 'Triangle', [270, 170]], ['Shop_6', 'Green', 'Circle', [630, 170]], ['Shop_6', 'Pink', 'Circle', [670, 170]], ['Shop_6', 'Skyblue', 'Circle', [670, 130]]]
+    
+    '''
+
     models_directory = os.getcwd()
     packages_models_directory = os.path.join(models_directory, "package_models")
     arena = sim.getObject('/Arena')    
@@ -132,9 +137,10 @@ def place_traffic_signals(traffic_signals, sim, all_models):
         objectHandle=sim.loadModel(traffic_sig_model)
         sim.setObjectParent(objectHandle,arena,True)
         p=get_coord(i)
-        p.append(0.2)
+        p.append(0.15588)
         sim.setObjectPosition(objectHandle,arena,p)
         all_models.append(objectHandle)
+        sim.setObjectAlias(objectHandle,'Signal_'+i)
 ####################################################################
     return all_models
 
@@ -179,16 +185,19 @@ def place_start_end_nodes(start_node, end_node, sim, all_models):
     objectHandle=sim.loadModel(start_node_model)
     sim.setObjectParent(objectHandle,arena,True)
     p=get_coord(start_node)
-    p.append(0.2)
+    p.append(0.15588)
     sim.setObjectPosition(objectHandle,arena,p)
     all_models.append(objectHandle)
+    sim.setObjectAlias(objectHandle,'Start_Node')
+
 
     objectHandle=sim.loadModel(end_node_model)
     sim.setObjectParent(objectHandle,arena,True)
     p=get_coord(end_node)
-    p.append(0.2)
+    p.append(0.15588)
     sim.setObjectPosition(objectHandle,arena,p)
     all_models.append(objectHandle)
+    sim.setObjectAlias(objectHandle,'End_Node')
 
 
 ####################################################################
@@ -239,8 +248,9 @@ def place_horizontal_barricade(horizontal_roads_under_construction, sim, all_mod
         p=[]
         p.append((p1[0]+p2[0])/2)
         p.append((p1[1]+p2[1])/2)
-        p.append(0.0025)
+        p.append(0.002)
         sim.setObjectPosition(objectHandle,arena,p)
+        sim.setObjectAlias(objectHandle,'Horizontal_missing_node_'+i[:2]+'_'+i[-2:])
         all_models.append(objectHandle)
     
 
@@ -294,8 +304,9 @@ def place_vertical_barricade(vertical_roads_under_construction, sim, all_models)
         p=[]
         p.append((p1[0]+p2[0])/2)
         p.append((p1[1]+p2[1])/2)
-        p.append(0.0025)
+        p.append(0.002)
         sim.setObjectPosition(objectHandle,arena,p)
+        sim.setObjectAlias(objectHandle,'Vertical_missing_node_'+i[:2]+'_'+i[-2:])
         all_models.append(objectHandle)
 
 ####################################################################
