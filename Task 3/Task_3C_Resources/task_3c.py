@@ -31,11 +31,10 @@ import cv2
 import numpy
 from zmqRemoteApi import RemoteAPIClient
 import zmq
-import requests
 ##############################################################
 
 #################################  ADD UTILITY FUNCTIONS HERE  #######################
-
+A=B=C=D=None
 
 #####################################################################################
 
@@ -73,22 +72,20 @@ def perspective_transform(image):
     try:
         A=[b[3][2][0],b[3][2][1]]
     except:
-        A=None
+        pass
     try:
         B=[b[2][1][0],b[2][1][1]]
     except:
-        B=None
+        pass
     try:
         C=[b[1][0][0],b[1][0][1]]
     except:
-        C=None
+        pass
     try:
         D=[b[4][3][0],b[4][3][1]]
     except:
-        D=None
+        pass
     #print(A,B,C,D)
-    if (A==None and B!=None and C!=None and D!=None):
-        A=[B[1],D[0]]
     AD = numpy.sqrt(((A[0] - D[0]) ** 2) + ((A[1] - D[1]) ** 2))
     BC = numpy.sqrt(((B[0] - C[0]) ** 2) + ((B[1] - C[1]) ** 2))
     maxw = max(int(AD), int(BC))
@@ -99,9 +96,11 @@ def perspective_transform(image):
     o = numpy.float32([[0, 0], [0, maxh - 1], [maxw - 1, maxh - 1],[maxw - 1, 0]])
     M = cv2.getPerspectiveTransform(i,o)
     out = cv2.warpPerspective(img,M,(maxw, maxh),flags=cv2.INTER_LINEAR)
-    cv2.imshow("O",out)
-    cv2.waitKey(1)
-    print("perspective")
+    out = cv2.resize(out, [out.shape[1], out.shape[1]])
+    
+    #cv2.imshow("O",out)
+    #cv2.waitKey(1)
+    #print("perspective")
 ######################################################################################
 
     return out
@@ -142,7 +141,7 @@ def transform_values(image):
 #################################  ADD YOUR CODE HERE  ###############################
     img=perspective_transform(image)
     a,_ =task_1b.detect_ArUco_details(img)
-    print("5 detected")
+    #print("5 detected")
     scene_parameters.append(a[5][0][0]/img.shape[0])
     scene_parameters.append(a[5][0][1]/img.shape[1])
     scene_parameters.append(a[5][1])
@@ -192,32 +191,59 @@ def set_values(scene_parameters):
         ang=numpy.interp(ang,[0,180],[-180,0])
     rad=numpy.radians(ang)
     b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[0,0,rad])
-    print("Emulated")
+    #print("Emulated")
 ######################################################################################
     #print(pos)
     #print(ang)
     return None
 
 if __name__ == "__main__":
-    url="http://192.168.152.71:8080/shot.jpg"
+    
     client = RemoteAPIClient()
     sim = client.getObject('sim')
     task_1b = __import__('task_1b')
     vid = cv2.VideoCapture(r"C:\Users\Vasumathi T\Downloads\20230102_113749.mp4")
-
+    vid = cv2.VideoCapture(1)
+    vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
+    height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    #print(width, height)
     #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    while(A==None or B==None or C==None or D==None):
+        ret, img = vid.read(1)
+        a,b =task_1b.detect_ArUco_details(img)
+        try:
+            A=[b[3][2][0],b[3][2][1]]
+        except:
+            pass
+        try:
+            B=[b[2][1][0],b[2][1][1]]
+        except:
+            pass
+        try:
+            C=[b[1][0][0],b[1][0][1]]
+        except:
+            pass
+        try:
+            D=[b[4][3][0],b[4][3][1]]
+        except:
+            pass 
+        #print(A,B,C,D)
+
+
     while(1):
         ret, img = vid.read()
-        img=cv2.resize(img, (800, 500))
-        #img=cv2.imread(r"C:\Users\Vasumathi T\Downloads\Eyantra\Task 3\Task_3C_Resources\aruco_1.png")
-        cv2.imshow("g",img)
-        cv2.waitKey(1)
-        #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         try:
             set_values(transform_values(img))
         except:
             pass
-
+        img = cv2.resize(img, [640, 360])
+        cv2.imshow("g",img)
+        cv2.waitKey(1)
+        #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
 #################################  ADD YOUR CODE HERE  ################################
 
 #######################################################################################
