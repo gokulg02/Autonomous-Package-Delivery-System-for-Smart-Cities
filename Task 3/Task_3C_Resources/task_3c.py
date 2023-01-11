@@ -202,7 +202,6 @@ if __name__ == "__main__":
     client = RemoteAPIClient()
     sim = client.getObject('sim')
     task_1b = __import__('task_1b')
-    vid = cv2.VideoCapture(r"C:\Users\Vasumathi T\Downloads\20230102_113749.mp4")
     vid = cv2.VideoCapture(1)
     vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
