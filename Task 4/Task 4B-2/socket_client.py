@@ -142,7 +142,7 @@ def send_message_via_socket(client, message):
 
 if __name__ == "__main__":
 
-		host = "192.168.1.4"
+		host = "192.168.75.220"
 		port = 5050
 
 
@@ -156,7 +156,7 @@ if __name__ == "__main__":
 			print("Error in setting up client")
 			print(error)
 			sys.exit()
-
+'''
 		## Send "START" command to PB task 3D socket
 		print("\nSTART command sent to PB Task 3D socket server\n")
 		send_message_via_socket(client, "START")
@@ -193,4 +193,4 @@ if __name__ == "__main__":
 
 			else:
 				print("Received message from server: " + message)
-
+'''

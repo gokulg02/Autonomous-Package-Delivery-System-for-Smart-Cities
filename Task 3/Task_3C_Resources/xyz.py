@@ -183,6 +183,7 @@ def set_values(scene_parameters):
     x=numpy.interp(scene_parameters[0],[0,1],[0.89,-0.89])
     y=numpy.interp(scene_parameters[1],[0,1],[-0.89,0.89])
     y-=0.05
+
     a=sim.setObjectPosition(aruco_handle,sim.handle_parent,[x,y,0.029])
     #ang=sim.getObjectOrientation(aruco_handle,sim.handle_parent)
     ang=scene_parameters[2]
@@ -203,11 +204,13 @@ if __name__ == "__main__":
     client = RemoteAPIClient()
     sim = client.getObject('sim')
     task_1b = __import__('task_1b')
+    '''
     vid = cv2.VideoCapture(1)
     vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
     height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    
     #print(width, height)
     #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
@@ -243,7 +246,13 @@ if __name__ == "__main__":
         cv2.imshow("g",img)
         cv2.waitKey(1)
         #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        
+    '''
+    img=cv2.imread(r"C:\Users\Vasumathi T\Downloads\Eyantra\Task 3\Task_3C_Resources\aruco_1.png")
+    set_values(transform_values(img))
+    aruco_handle = sim.getObject('/bot')
+    #b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[0,-1.57,0])
+    #arena=sim.getObject('/arena')
+    #a=sim.setObjectPosition(aruco_handle,sim.handle_parent,[0.89,-0.89,0.029])
 #################################  ADD YOUR CODE HERE  ################################
 
 #######################################################################################

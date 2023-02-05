@@ -153,7 +153,7 @@ def receive_message_via_socket(connection):
 	message = None
 
 	##################	ADD YOUR CODE HERE	##################
-	message = connection.recv(10)
+	message = connection.recv(50)
 	message = str(message, 'UTF-8')
 
 	##########################################################
