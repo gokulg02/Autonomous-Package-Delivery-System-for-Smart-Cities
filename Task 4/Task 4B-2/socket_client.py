@@ -156,6 +156,8 @@ if __name__ == "__main__":
 			print("Error in setting up client")
 			print(error)
 			sys.exit()
+		while(1):
+			pass
 '''
 		## Send "START" command to PB task 3D socket
 		print("\nSTART command sent to PB Task 3D socket server\n")

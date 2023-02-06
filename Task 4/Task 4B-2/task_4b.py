@@ -48,6 +48,7 @@ D=None
 ## Import PB_theme_functions code
 try:
 	pb_theme = __import__('PB_theme_functions')
+	task_1b = __import__('task_1b')
 
 except ImportError:
 	print('\n[ERROR] PB_theme_functions.py file is not present in the current directory.')
@@ -248,7 +249,8 @@ def task_4b_implementation(sim):
 	"""
 
 	##################	ADD YOUR CODE HERE	##################
-	task_1b = __import__('task_1b')
+	global A,B,C,D
+	print("emu stsrted")
 	vid = cv2.VideoCapture(1)
 	vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 	vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -273,9 +275,15 @@ def task_4b_implementation(sim):
 			D=[b[4][3][0],b[4][3][1]]
 		except:
 			pass 
+		print(A,B,C,D)
 
+	#pb_theme.send_message_via_socket(connection_2, "START_RUN")
 
 	while(1):
+		#msg=pb_theme.receive_message_via_socket(connection_2)
+		#if (msg=="END"):
+		#	break
+		#else:
 		ret, img = vid.read()
 		try:
 			set_values(transform_values(img),sim)
