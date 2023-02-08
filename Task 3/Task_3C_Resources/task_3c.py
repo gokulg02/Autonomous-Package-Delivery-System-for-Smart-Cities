@@ -203,6 +203,10 @@ if __name__ == "__main__":
     client = RemoteAPIClient()
     sim = client.getObject('sim')
     task_1b = __import__('task_1b')
+    aruco_handle = sim.getObject('/bot')
+    a=sim.setObjectPosition(aruco_handle,sim.handle_parent,[-0.89,-0.89,0.029])
+    b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[0,0,0])
+    '''
     vid = cv2.VideoCapture(1)
     vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -243,6 +247,7 @@ if __name__ == "__main__":
         cv2.imshow("g",img)
         cv2.waitKey(1)
         #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        '''
         
 #################################  ADD YOUR CODE HERE  ################################
 

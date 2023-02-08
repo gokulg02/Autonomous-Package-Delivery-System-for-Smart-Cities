@@ -100,7 +100,7 @@ def receive_message_via_socket(client):
 	message = None
 
 	##################	ADD YOUR CODE HERE	##################
-	message = client.recv(10)
+	message = client.recv(20)
 	message = str(message, 'UTF-8')
 
 	##########################################################
@@ -142,7 +142,7 @@ def send_message_via_socket(client, message):
 
 if __name__ == "__main__":
 
-		host = "192.168.75.220"
+		host = "192.168.1.2"
 		port = 5050
 
 
@@ -156,43 +156,16 @@ if __name__ == "__main__":
 			print("Error in setting up client")
 			print(error)
 			sys.exit()
+		msg=receive_message_via_socket(client)
 		while(1):
-			pass
-'''
-		## Send "START" command to PB task 3D socket
-		print("\nSTART command sent to PB Task 3D socket server\n")
-		send_message_via_socket(client, "START")
-
-		## Receive words from the original phrase until the command 'SHUFFLE'
-		## is received after which it breaks out of the loop.
-		while True:
 			
-			message = receive_message_via_socket(client)
-			
-
-			if message == "SHUFFLE":
+			if (msg=='START'):
 				break
-
-			else:
-				print("Received message from server: " + message)
-
-		print("\nWaiting for shuffled phrase \n")
-
-
-		## Receive words from the shuffled phrase until the command 'KILL'
-		## is received after which it breaks out of the loop.
-		while True:
-			
-			message = receive_message_via_socket(client)
-
-			send_message_via_socket(client, message)
-			
-
-			if message == "KILL":
-				## Socket server connection is closed by the server
-				print("\nSocket connection closed by server")
+		msg=receive_message_via_socket(client)
+		while(1):
+			#msg=receive_message_via_socket(client)
+			if (msg=='START_RUN'):
+				print("run")
 				break
-
-			else:
-				print("Received message from server: " + message)
-'''
+		time.sleep(10)
+		send_message_via_socket(client,"END")

@@ -38,7 +38,8 @@ from pyzbar.pyzbar import decode
 import json
 import random
 import numpy
-##############################################################
+import _thread as thread
+###############################################################
 
 A=None
 B=None
@@ -122,8 +123,8 @@ def perspective_transform(image):
     out = cv2.warpPerspective(image,M,(maxw, maxh),flags=cv2.INTER_LINEAR)
     out = cv2.resize(out, [out.shape[1], out.shape[1]])
     
-    #cv2.imshow("p",out)
-    #cv2.waitKey(1)
+    cv2.imshow("p",out)
+    cv2.waitKey(1)
     #print("perspective")
 ######################################################################################
 
@@ -217,12 +218,28 @@ def set_values(scene_parameters,sim):
         ang=numpy.interp(ang,[0,180],[-180,0])
     rad=numpy.radians(ang)
     b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[0,-1.57,0])
-    #print("Emulated")
+    print("Emulated")
 ######################################################################################
     #print(pos)
     #print(ang)
     return None
 
+def emulation_thread(sim):
+    global A,B,C,D
+    vid = cv2.VideoCapture(r"C:\Users\Vasumathi T\Downloads\wetransfer_track_2023-02-06_1445\Final.mp4")
+    vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
+    height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    while(1):
+        ret, img = vid.read()
+        try:
+            set_values(transform_values(img),sim)
+        except:
+            pass
+        img = cv2.resize(img, [640, 360])
+        #cv2.imshow("g",img)
+        #cv2.waitKey(1)
 
 
 
@@ -250,14 +267,14 @@ def task_4b_implementation(sim):
 
 	##################	ADD YOUR CODE HERE	##################
 	global A,B,C,D
-	print("emu stsrted")
-	vid = cv2.VideoCapture(1)
+	#print("emu stsrted")
+	vid = cv2.VideoCapture(r"C:\Users\Vasumathi T\Downloads\wetransfer_track_2023-02-06_1445\Final.mp4")
 	vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 	vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 	width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
 	height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
 	while(A==None or B==None or C==None or D==None):
-		ret, img = vid.read(1)
+		ret, img = vid.read()
 		a,b =task_1b.detect_ArUco_details(img)
 		try:
 			A=[b[3][2][0],b[3][2][1]]
@@ -278,20 +295,19 @@ def task_4b_implementation(sim):
 		print(A,B,C,D)
 
 	#pb_theme.send_message_via_socket(connection_2, "START_RUN")
-
+	thread.start_new_thread(emulation_thread,(sim,))
 	while(1):
-		#msg=pb_theme.receive_message_via_socket(connection_2)
-		#if (msg=="END"):
-		#	break
-		#else:
+		print(time.time())
+		time.sleep(5)
+	while(1):
 		ret, img = vid.read()
 		try:
 			set_values(transform_values(img),sim)
 		except:
 			pass
 		img = cv2.resize(img, [640, 360])
-		cv2.imshow("g",img)
-		cv2.waitKey(1)
+		#cv2.imshow("g",img)
+		#cv2.waitKey(1)
 
 	##########################################################
 
@@ -300,8 +316,10 @@ if __name__ == "__main__":
 	
 	host = ''
 	port = 5050
+	coppelia_client = RemoteAPIClient()
+	sim = coppelia_client.getObject('sim')
 
-
+	
 	## Set up new socket server
 	try:
 		server = pb_theme.setup_server(host, port)
@@ -314,7 +332,7 @@ if __name__ == "__main__":
 		print(error)
 		sys.exit()
 
-
+	'''
 	## Set up new connection with a socket client (PB_task3d_socket.exe)
 	try:
 		print("\nPlease run PB_socket.exe program to connect to PB_socket client")
@@ -323,7 +341,7 @@ if __name__ == "__main__":
 
 	except KeyboardInterrupt:
 		sys.exit()
-
+	'''
 	# ## Set up new connection with Raspberry Pi
 	try:
 		print("\nPlease connect to Raspberry pi client")
@@ -333,6 +351,7 @@ if __name__ == "__main__":
 	except KeyboardInterrupt:
 		sys.exit()
 
+	'''
 	## Send setup message to PB_socket
 	pb_theme.send_message_via_socket(connection_1, "SETUP")
 
@@ -368,7 +387,7 @@ if __name__ == "__main__":
 		print('Your task_1a.py throwed an Exception, kindly debug your code!\n')
 		traceback.print_exc(file=sys.stdout)
 		sys.exit()
-
+	
 	try:
 
 		## Connect to CoppeliaSim arena
@@ -429,10 +448,10 @@ if __name__ == "__main__":
 
 	## Send Start Command to Raspberry Pi to start execution
 	pb_theme.send_message_via_socket(connection_2, "START")
-
+	'''
 
 	task_4b_implementation(sim)
-
+	'''
 	## Send Stop Simulation Command to PB_Socket
 	pb_theme.send_message_via_socket(connection_1, "SIMULATION_STOP")
 
@@ -448,3 +467,4 @@ if __name__ == "__main__":
 		if message == "SIMULATION_NOT_STOPPED_CORRECTLY":
 			print("[6] Simulation was not stopped in CoppeliaSim")
 			sys.exit()
+	'''
