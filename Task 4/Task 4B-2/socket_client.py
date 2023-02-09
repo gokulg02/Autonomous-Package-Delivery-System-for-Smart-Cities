@@ -100,7 +100,7 @@ def receive_message_via_socket(client):
 	message = None
 
 	##################	ADD YOUR CODE HERE	##################
-	message = client.recv(20)
+	message = client.recv(100)
 	message = str(message, 'UTF-8')
 
 	##########################################################
@@ -142,7 +142,7 @@ def send_message_via_socket(client, message):
 
 if __name__ == "__main__":
 
-		host = "192.168.1.2"
+		host = "192.168.75.220"
 		port = 5050
 
 
@@ -157,15 +157,3 @@ if __name__ == "__main__":
 			print(error)
 			sys.exit()
 		msg=receive_message_via_socket(client)
-		while(1):
-			
-			if (msg=='START'):
-				break
-		msg=receive_message_via_socket(client)
-		while(1):
-			#msg=receive_message_via_socket(client)
-			if (msg=='START_RUN'):
-				print("run")
-				break
-		time.sleep(10)
-		send_message_via_socket(client,"END")
