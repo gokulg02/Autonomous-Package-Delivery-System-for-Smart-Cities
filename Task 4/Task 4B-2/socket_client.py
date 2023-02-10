@@ -137,12 +137,40 @@ def send_message_via_socket(client, message):
 
 	##########################################################
 
+
+def straight():
+	time.sleep(3)
+	send_message_via_socket(client,"STRAIGHT")
+
+def left():
+	time.sleep(3)
+	send_message_via_socket(client,"LEFT")
+
+def right():
+	time.sleep(3)
+	send_message_via_socket(client,"RIGHT")
+
+def wait_5():
+	time.sleep(3)
+	send_message_via_socket(client,"WAIT_5")
+
+def rev():
+	time.sleep(3)
+	send_message_via_socket(client,"REVERSE")
+
+def scan_qr():
+	time.sleep(3)
+	send_message_via_socket('SCAN_QR_POS')
+
+
+
+
 ######### YOU ARE NOT ALLOWED TO MAKE CHANGES TO THE MAIN SECTION #########
 #########      APART FROM THE REQUIRED AREAS (host, port etc)     #########
 
 if __name__ == "__main__":
 
-		host = "192.168.75.220"
+		host = "192.168.1.2"
 		port = 5050
 
 
@@ -156,4 +184,31 @@ if __name__ == "__main__":
 			print("Error in setting up client")
 			print(error)
 			sys.exit()
-		msg=receive_message_via_socket(client)
+		while(1):
+			msg=receive_message_via_socket(client)
+			if msg=="START":
+				print("emulation started")
+				while(1):
+					msg=receive_message_via_socket(client)
+					print(msg)
+					if msg=='s':
+						straight()
+					elif msg=='r':
+						right()
+					elif msg=='l':
+						left()
+					elif msg=='w':
+						wait_5()
+					elif msg=='rev':
+						rev()
+					elif msg=='SCAN_QR':
+						scan_qr()
+
+					elif msg=='STOP':
+						break
+			else:
+				pass
+			break	
+
+					
+		

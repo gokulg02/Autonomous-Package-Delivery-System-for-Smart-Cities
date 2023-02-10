@@ -45,7 +45,13 @@ A=None
 B=None
 C=None
 D=None
-
+c_n=None
+c_d='n'
+p1=['s','r','l','r','l','r','w','s','l']
+d=['n','e','s','w']
+p2=['rev','s','r']
+p3=['l']
+p4=['s','l','l']
 ## Import PB_theme_functions code
 try:
 	pb_theme = __import__('PB_theme_functions')
@@ -62,6 +68,59 @@ except Exception as e:
 	traceback.print_exc(file=sys.stdout)
 	sys.exit()
 
+def current_node_update(c_n,i):
+	global c_d
+	if (i=='s'):
+		if(c_d=='w'):
+			c_n=(chr(ord(c_n[0])-1))+c_n[1]
+		elif(c_d=='e'):
+			c_n=(chr(ord(c_n[0])+1))+c_n[1]
+		elif(c_d=='s'):
+			c_n=c_n[0]+(chr(ord(c_n[1])+1))
+		elif(c_d=='n'):
+			c_n=c_n[0]+(chr(ord(c_n[1])-1))
+	elif(i=='r'):
+		if(c_d=='w'):
+			c_n=c_n[0]+(chr(ord(c_n[1])-1))
+			c_d='n'
+		elif(c_d=='e'):
+			c_n=c_n[0]+(chr(ord(c_n[1])+1))
+			c_d='s'
+		elif(c_d=='s'):
+			c_n=(chr(ord(c_n[0])-1))+c_n[1]
+			c_d='w'
+		elif(c_d=='n'):
+			c_n=(chr(ord(c_n[0])+1))+c_n[1]
+			c_d='e'
+	elif(i=='l'):
+		if(c_d=='w'):
+			c_n=c_n[0]+(chr(ord(c_n[1])+1))
+			c_d='s'
+		elif(c_d=='e'):
+			c_n=c_n[0]+(chr(ord(c_n[1])-1))
+			c_d='n'
+		elif(c_d=='s'):
+			c_n=(chr(ord(c_n[0])+1))+c_n[1]
+			c_d='e'
+		elif(c_d=='n'):
+			c_n=(chr(ord(c_n[0])-1))+c_n[1]
+			c_d='w'
+	elif(i=='rev'):
+		if(c_d=='w'):
+			c_n=(chr(ord(c_n[0])+1))+c_n[1]
+			c_d='e'
+		elif(c_d=='e'):
+			c_n=(chr(ord(c_n[0])-1))+c_n[1]
+			c_d='w'
+		elif(c_d=='s'):
+			c_n=c_n[0]+(chr(ord(c_n[1])-1))
+			c_d='n'
+		elif(c_d=='n'):
+			c_n=c_n[0]+(chr(ord(c_n[1])+1))
+			c_d='s'
+	return c_n
+
+		
 
 def perspective_transform(image):
 
@@ -202,7 +261,7 @@ def set_values(scene_parameters,sim):
     ---
     set_values(scene_parameters)
     """   
-    aruco_handle = sim.getObject('/bot')
+    aruco_handle = sim.getObject('/Alpha_bot')
 #################################  ADD YOUR CODE HERE  ###############################
     #pos=sim.getObjectPosition(aruco_handle,sim.handle_parent)
     x=numpy.interp(scene_parameters[0],[0,1],[0.89,-0.89])
@@ -212,13 +271,18 @@ def set_values(scene_parameters,sim):
     a=sim.setObjectPosition(aruco_handle,sim.handle_parent,[x,y,0.029])
     #ang=sim.getObjectOrientation(aruco_handle,sim.handle_parent)
     ang=scene_parameters[2]
-    if ang<0:
-        ang=numpy.interp(ang,[-180,0],[0,180])
-    else:
-        ang=numpy.interp(ang,[0,180],[-180,0])
-    rad=numpy.radians(ang)
-    b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[0,-1.57,0])
-    print("Emulated")
+    l=[1.57,0,1.57]
+    if ang>-45 and ang<45 :
+        l=[1.57,0,1.57]
+    elif ang>45 and ang<135:
+        l=[0,1.57,-3.14]
+    elif (ang>135 and ang<180) or (ang<-135 and ang>-180):
+        l=[1.57,1.57,-1.57]
+    elif (ang>-135 and ang<-45):
+        l=[0,-1.57,0]
+    b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,l)
+
+	#print("Emulated")
 ######################################################################################
     #print(pos)
     #print(ang)
@@ -243,7 +307,7 @@ def emulation_thread(sim):
 
 
 
-def task_4b_implementation(sim):
+def task_4b_implementation(sim,detected_arena_parameters):
 	"""
 	Purpose:
 	---
@@ -266,7 +330,8 @@ def task_4b_implementation(sim):
 	"""
 
 	##################	ADD YOUR CODE HERE	##################
-	global A,B,C,D
+	global A,B,C,D,c_n
+	c_n=detected_arena_parameters['start_node']
 	#print("emu stsrted")
 	vid = cv2.VideoCapture(r"C:\Users\Vasumathi T\Downloads\wetransfer_track_2023-02-06_1445\Final.mp4")
 	vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
@@ -292,13 +357,48 @@ def task_4b_implementation(sim):
 			D=[b[4][3][0],b[4][3][1]]
 		except:
 			pass 
-		print(A,B,C,D)
-
-	#pb_theme.send_message_via_socket(connection_2, "START_RUN")
+		#print(A,B,C,D)
+	
 	thread.start_new_thread(emulation_thread,(sim,))
-	while(1):
-		print(time.time())
-		time.sleep(5)
+	pb_theme.send_message_via_socket(connection_2, "START")
+	for i in p1:
+		pb_theme.send_message_via_socket(connection_2,i)
+		msg = pb_theme.receive_message_via_socket(connection_2)
+		c_n=current_node_update(c_n,i)
+		if (msg=="WAIT_5"):
+			print("WAIT_5")
+		else:
+			print("ARRIVED AT NODE "+c_n)
+	#package pickup
+	for i in p2:
+		pb_theme.send_message_via_socket(connection_2,i)
+		msg = pb_theme.receive_message_via_socket(connection_2)
+		c_n=current_node_update(c_n,i)
+		if (msg=="WAIT_5"):
+			print("WAIT_5")
+		else:
+			print("ARRIVED AT NODE "+c_n)
+	#package 1 delivery
+	for i in p3:
+		pb_theme.send_message_via_socket(connection_2,i)
+		msg = pb_theme.receive_message_via_socket(connection_2)
+		c_n=current_node_update(c_n,i)
+		if (msg=="WAIT_5"):
+			print("WAIT_5")
+		else:
+			print("ARRIVED AT NODE "+c_n)
+	#package 2 delivery
+	for i in p4:
+		pb_theme.send_message_via_socket(connection_2,i)
+		msg = pb_theme.receive_message_via_socket(connection_2)
+		c_n=current_node_update(c_n,i)
+		if (msg=="WAIT_5"):
+			print("WAIT_5")
+		else:
+			print("ARRIVED AT NODE "+c_n)
+	pb_theme.send_message_via_socket(connection_2,'STOP')
+	exit()
+	'''
 	while(1):
 		ret, img = vid.read()
 		try:
@@ -308,7 +408,7 @@ def task_4b_implementation(sim):
 		img = cv2.resize(img, [640, 360])
 		#cv2.imshow("g",img)
 		#cv2.waitKey(1)
-
+	'''
 	##########################################################
 
 
@@ -363,7 +463,7 @@ if __name__ == "__main__":
 		else:
 			print("Cannot proceed further until SETUP command is received")
 			message = pb_theme.receive_message_via_socket(connection_1)
-
+	'''
 	try:
 		# obtain required arena parameters
 		config_img = cv2.imread("config_image.png")
@@ -387,7 +487,7 @@ if __name__ == "__main__":
 		print('Your task_1a.py throwed an Exception, kindly debug your code!\n')
 		traceback.print_exc(file=sys.stdout)
 		sys.exit()
-	
+	'''
 	try:
 
 		## Connect to CoppeliaSim arena
@@ -450,7 +550,7 @@ if __name__ == "__main__":
 	pb_theme.send_message_via_socket(connection_2, "START")
 	'''
 
-	task_4b_implementation(sim)
+	task_4b_implementation(sim,detected_arena_parameters)
 	'''
 	## Send Stop Simulation Command to PB_Socket
 	pb_theme.send_message_via_socket(connection_1, "SIMULATION_STOP")
