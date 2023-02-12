@@ -139,28 +139,31 @@ def send_message_via_socket(client, message):
 
 
 def straight():
-	time.sleep(3)
+	time.sleep(1)
 	send_message_via_socket(client,"STRAIGHT")
 
 def left():
-	time.sleep(3)
+	time.sleep(1)
 	send_message_via_socket(client,"LEFT")
 
 def right():
-	time.sleep(3)
+	time.sleep(1)
 	send_message_via_socket(client,"RIGHT")
 
 def wait_5():
-	time.sleep(3)
+	time.sleep(1)
 	send_message_via_socket(client,"WAIT_5")
 
 def rev():
-	time.sleep(3)
+	time.sleep(1)
 	send_message_via_socket(client,"REVERSE")
 
 def scan_qr():
-	time.sleep(3)
+	time.sleep(1)
 	send_message_via_socket('SCAN_QR_POS')
+
+def pick(color,led):
+	print(color,led)
 
 
 
@@ -203,7 +206,9 @@ if __name__ == "__main__":
 						rev()
 					elif msg=='SCAN_QR':
 						scan_qr()
-
+					elif msg[:4]=="PICK":
+						temp=msg.split('_')
+						pick(temp[1],temp[2])
 					elif msg=='STOP':
 						break
 			else:

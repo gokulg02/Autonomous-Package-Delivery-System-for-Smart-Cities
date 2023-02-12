@@ -248,13 +248,16 @@ if __name__ == "__main__":
         #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     '''
     img=cv2.imread(r"C:\Users\Vasumathi T\Downloads\Eyantra\Task 3\Task_3C_Resources\aruco_1.png")
-    set_values(transform_values(img))
-    aruco_handle = sim.getObject('/bot')
+    #set_values(transform_values(img))
+    #aruco_handle = sim.getObject('/p3')
     #b=sim.setObjectOrientation(aruco_handle,sim.handle_parent,[0,-1.57,0])
-    #arena=sim.getObject('/arena')
-    #a=sim.setObjectPosition(aruco_handle,sim.handle_parent,[0.89,-0.89,0.029])
-#################################  ADD YOUR CODE HERE  ################################
+    a=sim.getObjectPosition(sim.getObject('/Alpha_bot'),sim.handle_parent,[0.03,0,-0.05])
+    print(a)
 
+#################################  ADD YOUR CODE HERE  ################################
+#p1 - [0.03,0,0.04]
+#p2 - [0.03,0,-0.01]
+#p2 - [0.03,0,-0.05]
 #######################################################################################
 
 

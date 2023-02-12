@@ -52,6 +52,14 @@ d=['n','e','s','w']
 p2=['rev','s','r']
 p3=['l']
 p4=['s','l','l']
+bot_pack=dict()
+bot_pack[1]=[]
+bot_pack[3]=[]
+bot_pack[2]=[]
+drop={"Orange_cone": "E5", "Pink_cone": "E4"}
+medicine_package_details=[]
+shop_no={'F':5,'E':4,'D':3,'C':2,'B':1}
+
 ## Import PB_theme_functions code
 try:
 	pb_theme = __import__('PB_theme_functions')
@@ -124,33 +132,6 @@ def current_node_update(c_n,i):
 
 def perspective_transform(image):
 
-    """
-    Purpose:
-    ---
-    This function takes the image as an argument and returns the image after 
-    applying perspective transform on it. Using this function, you should
-    crop out the arena from the full frame you are receiving from the 
-    overhead camera feed.
-
-    HINT:
-    Use the ArUco markers placed on four corner points of the arena in order
-    to crop out the required portion of the image.
-
-    Input Arguments:
-    ---
-    `image` :	[ numpy array ]
-            numpy array of image returned by cv2 library 
-
-    Returns:
-    ---
-    `warped_image` : [ numpy array ]
-            return cropped arena image as a numpy array
-    
-    Example call:
-    ---
-    warped_image = perspective_transform(image)
-    """   
-    
 #################################  ADD YOUR CODE HERE  ###############################
     a,b =task_1b.detect_ArUco_details(image)
     try:
@@ -189,38 +170,7 @@ def perspective_transform(image):
 
     return out
 
-def transform_values(image):
-
-    """
-    Purpose:
-    ---
-    This function takes the image as an argument and returns the 
-    position and orientation of the ArUco marker (with id 5), in the 
-    CoppeliaSim scene.
-
-    Input Arguments:
-    ---
-    `image` :	[ numpy array ]
-            numpy array of image returned by camera
-
-    Returns:
-    ---
-    `scene_parameters` : [ list ]
-            a list containing the position and orientation of ArUco 5
-            scene_parameters = [c_x, c_y, c_angle] where
-            c_x is the transformed x co-ordinate [float]
-            c_y is the transformed y co-ordinate [float]
-            c_angle is the transformed angle [angle]
-    
-    HINT:
-        Initially the image should be cropped using perspective transform 
-        and then values of ArUco (5) should be transformed to CoppeliaSim
-        scale.
-    
-    Example call:
-    ---
-    scene_parameters = transform_values(image)
-    """   
+def transform_values(image):  
     scene_parameters = []
 #################################  ADD YOUR CODE HERE  ###############################
     img=perspective_transform(image)
@@ -236,31 +186,7 @@ def transform_values(image):
 
 
 def set_values(scene_parameters,sim):
-    """
-    Purpose:
-    ---
-    This function takes the scene_parameters, i.e. the transformed values for
-    position and orientation of the ArUco marker, and sets the position and 
-    orientation in the CoppeliaSim scene.
 
-    Input Arguments:
-    ---
-    `scene_parameters` :	[ list ]
-            list of co-ordinates and orientation obtained from transform_values()
-            function
-
-    Returns:
-    ---
-    None
-
-    HINT:
-        Refer Regular API References of CoppeliaSim to find out functions that can
-        set the position and orientation of an object.
-    
-    Example call:
-    ---
-    set_values(scene_parameters)
-    """   
     aruco_handle = sim.getObject('/Alpha_bot')
 #################################  ADD YOUR CODE HERE  ###############################
     #pos=sim.getObjectPosition(aruco_handle,sim.handle_parent)
@@ -306,31 +232,80 @@ def emulation_thread(sim):
         #cv2.waitKey(1)
 
 
+def pickup(node,connection_2,sim):
+	global medicine_package_details,shop_no,bot_pack
+	packages=medicine_package_details[int(shop_no[node[0]])]
+	
+	if (packages!= [] and bot_pack[1]==[]):
+		bot_pack[1]=[packages[0],drop[packages[0]]]
+		temp=packages[0].split('_')
+		temp.append(drop[packages[0]])
+		print("PICKED UP: "+temp[0]+"," +temp[1]+","+ temp[2])
+		handle='/'+packages[0]
+		a=sim.setObjectPosition(sim.getObject(handle),sim.getObject('/Alpha_bot'),[0.03,0,0.04])
+		sim.setObjectParent(sim.getObject(handle),sim.getObject('/Alpha_bot'),True)
+		i="PICK_"+temp[0]+"_"+'1'
+		pb_theme.send_message_via_socket(connection_2,i)
+		packages.remove(packages[0])
+
+	if (packages!= [] and bot_pack[2]==[]):
+		temp=packages[0].split('_')
+		bot_pack[2]=[packages[0],drop[packages[0]]]
+		temp.append(drop[packages[0]])
+		handle='/'+packages[0]
+		a=sim.setObjectPosition(sim.getObject('/'+packages[0]),sim.getObject('/Alpha_bot'),[0.03,0,-0.01])
+		sim.setObjectParent(sim.getObject(handle),sim.getObject('/Alpha_bot'),True)
+		print("PICKED UP: "+temp[0]+"," +temp[1]+","+ temp[2])
+		i="PICK_"+temp[0]+"_"+'1'
+		pb_theme.send_message_via_socket(connection_2,i)
+		packages.remove(packages[0])
+
+	if (packages!= [] and bot_pack[3]==[]):
+		temp=packages[0].split('_')
+		bot_pack[3]=[packages[0],drop[packages[0]]]
+		temp.append(drop[packages[0]])
+		handle='/'+packages[0]
+		a=sim.setObjectPosition(sim.getObject('/'+packages[0]),sim.getObject('/Alpha_bot'),[0.03,0,-0.05])
+		sim.setObjectParent(sim.getObject(handle),sim.getObject('/Alpha_bot'),True)
+		print("PICKED UP: "+temp[0]+"," +temp[1]+","+ temp[2])
+		i="PICK_"+temp[0]+"_"+'1'
+		pb_theme.send_message_via_socket(connection_2,i)
+		packages.remove(packages[0])
+
+
+
+def deliver():
+	global c_n,bot_pack,c_d
+	pos=sim.getObjectPosition(sim.getObject('/Alpha_bot'),sim.handle_parent)
+	print(pos)
+	if (bot_pack[1]!=[] and c_n==bot_pack[1][1]):
+		pack=bot_pack[1][0]
+		sim.setObjectPosition(sim.getObject('/'+pack),sim.handle_parent,[pos[0]+0.1,pos[1]+0.1,0.029])
+		sim.setObjectParent(sim.getObject('/'+pack),sim.getObject('/Arena'),True)
+		print(sim.getObjectPosition(sim.getObject('/'+pack),sim.handle_parent))
+		bot_pack[1]=[]
+
+	if (bot_pack[2]!=[] and c_n==bot_pack[2][1]):
+		pack=bot_pack[2][0]
+		sim.setObjectPosition(sim.getObject('/'+pack),sim.handle_parent,[pos[0]+0.1,pos[1]+0.1,pos[2]])
+		sim.setObjectParent(sim.getObject('/'+pack),sim.getObject('/Arena'),True)
+		print(sim.getObjectPosition(sim.getObject('/'+pack),sim.handle_parent))
+		bot_pack[2]=[]
+	
+	if (bot_pack[3]!=[] and c_n==bot_pack[3][1]):
+		pack=bot_pack[3][0]
+		sim.setObjectPosition(sim.getObject('/'+pack),sim.handle_parent,[pos[0]+0.1,pos[1]+0.1,pos[2]])
+		sim.setObjectParent(sim.getObject('/'+pack),sim.getObject('/Arena'),True)
+		bot_pack[3]=[]
+
+
+
+		
+
 
 def task_4b_implementation(sim,detected_arena_parameters):
-	"""
-	Purpose:
-	---
-	This function contains the implementation logic for task 4B 
-
-	Input Arguments:
-	---
-    `sim` : [ object ]
-            ZeroMQ RemoteAPI object
-
-	You are free to define additional input arguments for this function.
-
-	Returns:
-	---
-	You are free to define output parameters for this function.
-	
-	Example call:
-	---
-	task_4b_implementation(sim)
-	"""
-
 	##################	ADD YOUR CODE HERE	##################
-	global A,B,C,D,c_n
+	global A,B,C,D,c_n,c_d
 	c_n=detected_arena_parameters['start_node']
 	#print("emu stsrted")
 	vid = cv2.VideoCapture(r"C:\Users\Vasumathi T\Downloads\wetransfer_track_2023-02-06_1445\Final.mp4")
@@ -369,7 +344,10 @@ def task_4b_implementation(sim,detected_arena_parameters):
 			print("WAIT_5")
 		else:
 			print("ARRIVED AT NODE "+c_n)
+	
 	#package pickup
+	pickup(c_n,connection_2,sim)
+
 	for i in p2:
 		pb_theme.send_message_via_socket(connection_2,i)
 		msg = pb_theme.receive_message_via_socket(connection_2)
@@ -379,6 +357,7 @@ def task_4b_implementation(sim,detected_arena_parameters):
 		else:
 			print("ARRIVED AT NODE "+c_n)
 	#package 1 delivery
+	deliver()
 	for i in p3:
 		pb_theme.send_message_via_socket(connection_2,i)
 		msg = pb_theme.receive_message_via_socket(connection_2)
@@ -388,6 +367,7 @@ def task_4b_implementation(sim,detected_arena_parameters):
 		else:
 			print("ARRIVED AT NODE "+c_n)
 	#package 2 delivery
+	deliver()
 	for i in p4:
 		pb_theme.send_message_via_socket(connection_2,i)
 		msg = pb_theme.receive_message_via_socket(connection_2)
@@ -418,7 +398,7 @@ if __name__ == "__main__":
 	port = 5050
 	coppelia_client = RemoteAPIClient()
 	sim = coppelia_client.getObject('sim')
-
+	print("234")
 	
 	## Set up new socket server
 	try:
@@ -432,7 +412,7 @@ if __name__ == "__main__":
 		print(error)
 		sys.exit()
 
-	'''
+	
 	## Set up new connection with a socket client (PB_task3d_socket.exe)
 	try:
 		print("\nPlease run PB_socket.exe program to connect to PB_socket client")
@@ -441,7 +421,7 @@ if __name__ == "__main__":
 
 	except KeyboardInterrupt:
 		sys.exit()
-	'''
+	
 	# ## Set up new connection with Raspberry Pi
 	try:
 		print("\nPlease connect to Raspberry pi client")
@@ -451,7 +431,7 @@ if __name__ == "__main__":
 	except KeyboardInterrupt:
 		sys.exit()
 
-	'''
+	
 	## Send setup message to PB_socket
 	pb_theme.send_message_via_socket(connection_1, "SETUP")
 
@@ -463,7 +443,7 @@ if __name__ == "__main__":
 		else:
 			print("Cannot proceed further until SETUP command is received")
 			message = pb_theme.receive_message_via_socket(connection_1)
-	'''
+	
 	try:
 		# obtain required arena parameters
 		config_img = cv2.imread("config_image.png")
@@ -475,7 +455,8 @@ if __name__ == "__main__":
 		horizontal_roads_under_construction = detected_arena_parameters['horizontal_roads_under_construction']
 		vertical_roads_under_construction = detected_arena_parameters['vertical_roads_under_construction']
 
-		# print("Medicine Packages: ", medicine_package_details)
+		
+		print("Medicine Packages: ", medicine_package_details)
 		# print("Traffic Signals: ", traffic_signals)
 		# print("Start Node: ", start_node)
 		# print("End Node: ", end_node)
@@ -487,7 +468,7 @@ if __name__ == "__main__":
 		print('Your task_1a.py throwed an Exception, kindly debug your code!\n')
 		traceback.print_exc(file=sys.stdout)
 		sys.exit()
-	'''
+	
 	try:
 
 		## Connect to CoppeliaSim arena
@@ -535,6 +516,7 @@ if __name__ == "__main__":
 	
 	## Check if simulation started correctly
 	message = pb_theme.receive_message_via_socket(connection_1)
+	print(message)
 	while True:
 		# message = pb_theme.receive_message_via_socket(connection_1)
 		
@@ -548,10 +530,10 @@ if __name__ == "__main__":
 
 	## Send Start Command to Raspberry Pi to start execution
 	pb_theme.send_message_via_socket(connection_2, "START")
-	'''
+	
 
 	task_4b_implementation(sim,detected_arena_parameters)
-	'''
+	
 	## Send Stop Simulation Command to PB_Socket
 	pb_theme.send_message_via_socket(connection_1, "SIMULATION_STOP")
 
@@ -567,4 +549,4 @@ if __name__ == "__main__":
 		if message == "SIMULATION_NOT_STOPPED_CORRECTLY":
 			print("[6] Simulation was not stopped in CoppeliaSim")
 			sys.exit()
-	'''
+	
