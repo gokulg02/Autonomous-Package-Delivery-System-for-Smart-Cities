@@ -173,7 +173,7 @@ def pick(color,led):
 
 if __name__ == "__main__":
 
-		host = "192.168.1.2"
+		host = "172.20.10.5"
 		port = 5050
 
 
